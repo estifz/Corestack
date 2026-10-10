@@ -238,19 +238,65 @@ Install dependencies:
 pnpm install
 ```
 
+| [Prisma ORM](https://www.prisma.io/) | PostgreSQL ORM and contract management |
+| [PostgreSQL](https://www.postgresql.org/) | Relational Database |
+
 ### Environment Variables
 
+Authentication, storage, queues, and other reusable modules will be introduced in future phases.
 Create your environment file:
 
-```bash
-cp .env.example .env
-```
+````bash
 
-Configure the required environment variables inside `.env`.
+### Database
+
+- Prisma 8 contract-based PostgreSQL setup
+- Typed `User` and `Post` data contract
+- Generated contract metadata and TypeScript types
+- PostgreSQL readiness check
+- Database connection cleanup during shutdown
 
 > **Note:** Environment variables are validated using Zod when the application starts.
 
 ### Development
+
+### Prisma and PostgreSQL
+
+The project uses Prisma 8's contract workflow with PostgreSQL. The data contract is defined in
+[`src/prisma/contract.prisma`](src/prisma/contract.prisma). It currently contains the `User` and
+`Post` models.
+
+Set the database connection string in `.env`:
+
+```env
+DATABASE_URL="postgresql://postgres:password@localhost:5432/corestack"
+````
+
+After changing the contract, regenerate the checked-in contract artifacts:
+
+```bash
+pnpm prisma contract emit
+```
+
+This updates:
+
+- `src/prisma/contract.json` — runtime contract metadata
+- `src/prisma/contract.d.ts` — generated TypeScript contract types
+
+The application database client is exported from
+[`src/prisma/db.ts`](src/prisma/db.ts). Use this client from repositories and services rather than
+creating a separate Prisma client instance.
+
+The health endpoints are:
+
+```text
+GET /health  # process liveness
+GET /ready   # PostgreSQL readiness
+```
+
+`/ready` executes `SELECT 1` against PostgreSQL and returns `503` when the database is unavailable.
+On `SIGINT` or `SIGTERM`, the server stops accepting requests, closes the HTTP server, and closes
+the PostgreSQL connection.
 
 Start the development server:
 
