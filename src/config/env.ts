@@ -8,6 +8,7 @@ const envSchema = z.object({
     LOG_LEVEL: z.string(),
     RATE_LIMIT_WINDOW: z.coerce.number(),
     RATE_LIMIT_REQUEST: z.coerce.number(),
+    DATABASE_URL: z.string(),
 })
 
 type Env = z.infer<typeof envSchema>

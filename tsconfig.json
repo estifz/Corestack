@@ -3,7 +3,7 @@
         "rootDir": "./src",
         "outDir": "./dist",
 
-        "module": "nodenext",
+        "module": "preserve",
         "target": "esnext",
         "types": ["node"],
 
@@ -24,6 +24,10 @@
         "noUncheckedSideEffectImports": true,
         "moduleDetection": "force",
         "skipLibCheck": true,
-        "noEmitOnError": true
-    }
+        "noEmitOnError": true,
+        "moduleResolution": "bundler",
+        "resolveJsonModule": true
+    },
+    "include": ["src/**/*.ts"],
+    "exclude": ["node_modules", "dist"]
 }
