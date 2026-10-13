@@ -10,7 +10,9 @@
         "format": "prettier . --write",
         "format:check": "prettier . --check",
         "prepare": "husky",
-        "contract:emit": "prisma contract emit"
+        "contract:emit": "prisma contract emit",
+        "migration:plan": "pnpm exec prisma migration plan --name",
+        "migration:apply": "pnpm exec prisma db migrate --advance-ref db"
     },
     "keywords": [],
     "author": "",
