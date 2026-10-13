@@ -36,6 +36,7 @@
     "dependencies": {
         "@prisma/orm-postgres": "8.0.0-rc.14",
         "@types/cors": "^2.8.19",
+        "argon2": "^0.45.1",
         "compression": "^1.8.1",
         "cors": "^2.8.6",
         "express": "^5.2.1",
