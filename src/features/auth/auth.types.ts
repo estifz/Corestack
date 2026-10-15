@@ -24,3 +24,8 @@ export interface UserRecord extends AuthUser {
     passwordHash: string
     emailVerifiedAt: unknown | null
 }
+
+export interface LoginResult {
+    user: AuthUser
+    accessToken: string
+}

@@ -9,6 +9,8 @@ const envSchema = z.object({
     RATE_LIMIT_WINDOW: z.coerce.number(),
     RATE_LIMIT_REQUEST: z.coerce.number(),
     DATABASE_URL: z.string(),
+    JWT_SECRET: z.string().min(1, 'JWT_SECRET is required'),
+    JWT_EXPIRES_IN: z.string().default('15m'),
 })
 
 type Env = z.infer<typeof envSchema>

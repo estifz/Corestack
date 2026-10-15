@@ -2,11 +2,14 @@ import argon2 from 'argon2'
 import {
     ConflictError,
     ForbiddenError,
+    NotFoundError,
     UnauthorizedError,
 } from '../../utils/errors/appError.js'
+import { signAccessToken } from '../../utils/jwt.js'
 import type { AuthRepository } from './auth.repository.js'
 import type {
     AuthUser,
+    LoginResult,
     LoginUserInput,
     RegisterUserInput,
 } from './auth.types.js'
@@ -29,7 +32,7 @@ export class AuthService {
         })
     }
 
-    async login(input: LoginUserInput): Promise<AuthUser> {
+    async login(input: LoginUserInput): Promise<LoginResult> {
         const normalizedEmail = input.email.trim().toLowerCase()
         const user = await this.repository.findUserByEmail(normalizedEmail)
 
@@ -53,11 +56,27 @@ export class AuthService {
             throw new ForbiddenError('Account is not verified')
         }
 
-        return {
-            id: user.id,
-            email: user.email,
+        const accessToken = await signAccessToken({
+            userId: user.id,
             role: user.role,
-            isActive: user.isActive,
+        })
+
+        return {
+            user: {
+                id: user.id,
+                email: user.email,
+                role: user.role,
+                isActive: user.isActive,
+            },
+            accessToken,
         }
+    }
+
+    async getMe(userId: string): Promise<AuthUser> {
+        const user = await this.repository.findUserById(userId)
+        if (!user) {
+            throw new NotFoundError('User not found')
+        }
+        return user
     }
 }
