@@ -1,3 +1,4 @@
+import 'temporal-polyfill/full/global'
 import app from './app.js'
 import { ENV } from './config/env.js'
 import { logger } from './core/logger/logger.js'
