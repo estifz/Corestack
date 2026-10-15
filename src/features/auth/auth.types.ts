@@ -3,6 +3,11 @@ export interface RegisterUserInput {
     password: string
 }
 
+export interface LoginUserInput {
+    email: string
+    password: string
+}
+
 export interface CreateUserRecord {
     email: string
     passwordHash: string
@@ -13,4 +18,9 @@ export interface AuthUser {
     email: string
     role: 'USER' | 'ADMIN'
     isActive: boolean
+}
+
+export interface UserRecord extends AuthUser {
+    passwordHash: string
+    emailVerifiedAt: unknown | null
 }
