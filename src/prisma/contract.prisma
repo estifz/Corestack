@@ -13,7 +13,7 @@ namespace auth {
     emailVerifiedAt         Timestamptz(3)?
     isActive                Boolean                  @default(true)
 
-    refreshTokens           RefreshToken[]
+    sessions                Session[]
     emailVerificationTokens EmailVerificationToken[]
     passwordResetTokens     PasswordResetToken[]
 
@@ -23,21 +23,40 @@ namespace auth {
     @@map("users")
   }
 
+  model Session {
+    id           String         @id @default(uuid())
+    userId       String
+    deviceName   String?
+    ipAddress    String?
+    userAgent    String?
+    lastSeenAt   Timestamptz(3)?
+    expiresAt    Timestamptz(3)
+    revokedAt    Timestamptz(3)?
+
+    user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+    refreshTokens RefreshToken[]
+
+    createdAt    Timestamptz(3) @default(now())
+
+    @@index([userId])
+    @@index([expiresAt])
+
+    @@map("sessions")
+  }
+
   model RefreshToken {
     id         String          @id @default(uuid())
-    userId     String
+    sessionId  String
     tokenHash  String          @unique
-    familyId   String
     expiresAt  Timestamptz(3)
     consumedAt Timestamptz(3)?
     revokedAt  Timestamptz(3)?
 
-    user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+    session    Session         @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
     createdAt  Timestamptz(3)  @default(now())
 
-    @@index([userId])
-    @@index([familyId])
+    @@index([sessionId])
     @@index([expiresAt])
 
     @@map("refresh_tokens")
