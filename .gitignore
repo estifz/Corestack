@@ -2,6 +2,7 @@ node_modules/
 
 .env
 .env.*
+!.env.example
 
 dist/
 build/
@@ -15,3 +16,6 @@ build/
 .cursor/
 .windsurf/
 .devin/
+
+# doc
+auth.md

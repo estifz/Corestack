@@ -28,4 +28,39 @@ export interface UserRecord extends AuthUser {
 export interface LoginResult {
     user: AuthUser
     accessToken: string
+    refreshToken: string
+    refreshTokenMaxAgeMs: number
+}
+
+export interface AuthRequestMetadata {
+    ipAddress: string | null
+    userAgent: string | null
+}
+
+export interface CreateSessionInput extends AuthRequestMetadata {
+    userId: string
+    sessionExpiresAt: Temporal.Instant
+    refreshTokenHash: string
+    refreshTokenExpiresAt: Temporal.Instant
+}
+
+export interface RotateRefreshTokenInput {
+    tokenHash: string
+    nextTokenHash: string
+    now: Temporal.Instant
+    refreshTokenTtlSeconds: number
+}
+
+export type RotateRefreshTokenResult =
+    | {
+          kind: 'rotated'
+          user: Pick<AuthUser, 'id' | 'role'>
+          refreshTokenExpiresAt: Temporal.Instant
+      }
+    | { kind: 'invalid' | 'reused' }
+
+export interface RefreshResult {
+    accessToken: string
+    refreshToken: string
+    refreshTokenMaxAgeMs: number
 }

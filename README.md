@@ -30,11 +30,15 @@ CoreStack is built around a few core principles:
 
 ---
 
-## Current Version
+## Release History and Project Status
 
-**`v0.1.0`** — Phase 1: Core Foundation
+### `v0.1.0` — Phase 1: Core Foundation
 
-This release contains the reusable backend foundation.
+Phase 1 established the reusable backend foundation: project setup, feature-based architecture, validation, error handling, logging, security middleware, health checks, graceful shutdown, and development tooling.
+
+### `v0.2.0` — Phase 2: Data Persistence
+
+Phase 2 added the Prisma 8 contract-based PostgreSQL persistence foundation, including the database contract, generated contract artifacts, database readiness checks, and connection cleanup during shutdown.
 
 ### Current Scope
 
@@ -48,23 +52,27 @@ This release contains the reusable backend foundation.
 - Health Checks
 - Graceful Shutdown
 - Development Tooling
+- Authentication (registration, login, access tokens, refresh-token rotation, logout)
+- Prisma 8 contract-based PostgreSQL persistence
 
-Authentication, database integration, storage, queues, and other reusable modules will be introduced in future phases.
+Storage, queues, and other reusable modules remain future work.
 
 ---
 
 ## Tech Stack
 
-| Technology                                                | Purpose                    |
-| --------------------------------------------------------- | -------------------------- |
-| [Node.js](https://nodejs.org/)                            | Runtime                    |
-| [TypeScript](https://www.typescriptlang.org/)             | Programming Language       |
-| [Express](https://expressjs.com/)                         | HTTP Framework             |
-| [pnpm](https://pnpm.io/)                                  | Package Manager            |
-| [Zod](https://zod.dev/)                                   | Validation & Configuration |
-| [Pino](https://getpino.io/)                               | Structured Logging         |
-| [Husky](https://typicode.github.io/husky/)                | Git Hooks                  |
-| [lint-staged](https://github.com/lint-staged/lint-staged) | Pre-commit Checks          |
+| Technology                                                | Purpose                                   |
+| --------------------------------------------------------- | ----------------------------------------- |
+| [Node.js](https://nodejs.org/)                            | Runtime                                   |
+| [TypeScript](https://www.typescriptlang.org/)             | Programming Language                      |
+| [Express](https://expressjs.com/)                         | HTTP Framework                            |
+| [pnpm](https://pnpm.io/)                                  | Package Manager                           |
+| [Zod](https://zod.dev/)                                   | Validation & Configuration                |
+| [Pino](https://getpino.io/)                               | Structured Logging                        |
+| [Husky](https://typicode.github.io/husky/)                | Git Hooks                                 |
+| [lint-staged](https://github.com/lint-staged/lint-staged) | Pre-commit Checks                         |
+| [Prisma ORM](https://www.prisma.io/)                      | Prisma 8 contract-based PostgreSQL access |
+| [PostgreSQL](https://www.postgresql.org/)                 | Relational database                       |
 
 ---
 
@@ -76,21 +84,15 @@ CoreStack follows a **feature-based architecture** with clear separation between
 
 ```
 src/
+├── config/
 ├── core/
-│   ├── config/
-│   ├── errors/
-│   ├── logger/
-│   ├── middleware/
-│   └── ...
-│
-├── modules/
-│   └── <feature>/
-│       ├── controller/
-│       ├── service/
-│       ├── repository/
-│       ├── routes/
-│       └── validation/
-│
+├── features/
+│   ├── auth/
+│   ├── health/
+│   └── users/
+├── middlewares/
+├── prisma/
+├── utils/
 └── server.ts
 ```
 
@@ -238,39 +240,51 @@ Install dependencies:
 pnpm install
 ```
 
-| [Prisma ORM](https://www.prisma.io/) | PostgreSQL ORM and contract management |
-| [PostgreSQL](https://www.postgresql.org/) | Relational Database |
-
 ### Environment Variables
 
-Authentication, storage, queues, and other reusable modules will be introduced in future phases.
-Create your environment file:
+Create a `.env` file in the project root. Environment variables are validated with Zod when the application starts:
 
-````bash
+```env
+PORT=3000
+NODE_ENV=development
+LOG_LEVEL=info
+RATE_LIMIT_WINDOW=60000
+RATE_LIMIT_REQUEST=100
+DATABASE_URL="postgresql://postgres:password@localhost:5432/corestack"
+JWT_SECRET="replace-with-a-long-random-secret"
+JWT_EXPIRES_IN=15m
+REFRESH_TOKEN_TTL_SECONDS=604800
+SESSION_TTL_SECONDS=2592000
+REFRESH_COOKIE_NAME=refresh_token
+REFRESH_COOKIE_SAME_SITE=lax
+REFRESH_COOKIE_SECURE=false
+CORS_ORIGINS=http://localhost:3000
+```
+
+`JWT_SECRET` is required. In production, `REFRESH_COOKIE_SECURE` must be `true`; it must also be `true` when `REFRESH_COOKIE_SAME_SITE=none`.
+
+### Authentication
+
+Authentication routes are mounted under `/api/v1/auth`:
+
+- `POST /register` validates and creates a user; passwords are hashed with Argon2.
+- `POST /login` verifies credentials, checks that the account is active and email-verified, creates a session, and returns an access token. The refresh token is sent in an HTTP-only cookie.
+- `POST /refresh` rotates the refresh token and returns a new access token. It requires a trusted `Origin` configured in `CORS_ORIGINS`.
+- `POST /logout` revokes the session represented by the refresh cookie and clears the cookie. It also requires a trusted `Origin`.
+- `GET /me` returns the current user and requires `Authorization: Bearer <access-token>`.
 
 ### Database
 
-- Prisma 8 contract-based PostgreSQL setup
-- Typed `User` and `Post` data contract
-- Generated contract metadata and TypeScript types
-- PostgreSQL readiness check
-- Database connection cleanup during shutdown
+- Prisma 8 contract-based PostgreSQL setup.
+- The auth contract defines `User`, `Session`, `RefreshToken`, `EmailVerificationToken`, and `PasswordResetToken` models.
+- Generated contract metadata and TypeScript types are checked in.
+- PostgreSQL readiness check and database connection cleanup during shutdown.
 
-> **Note:** Environment variables are validated using Zod when the application starts.
-
-### Development
+The contract is defined in [`src/prisma/contract.prisma`](src/prisma/contract.prisma).
 
 ### Prisma and PostgreSQL
 
-The project uses Prisma 8's contract workflow with PostgreSQL. The data contract is defined in
-[`src/prisma/contract.prisma`](src/prisma/contract.prisma). It currently contains the `User` and
-`Post` models.
-
-Set the database connection string in `.env`:
-
-```env
-DATABASE_URL="postgresql://postgres:password@localhost:5432/corestack"
-````
+The project uses Prisma 8's contract workflow with PostgreSQL. Environment variables are validated with Zod at startup.
 
 After changing the contract, regenerate the checked-in contract artifacts:
 
