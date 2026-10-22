@@ -12,6 +12,14 @@ const envSchema = z.object({
     RATE_LIMIT_WINDOW: z.coerce.number(),
     RATE_LIMIT_REQUEST: z.coerce.number(),
     DATABASE_URL: z.string(),
+    RESEND_API_KEY: z.string().optional(),
+    RESEND_FROM_EMAIL: z.string().min(1).default('onboarding@resend.dev'),
+    API_BASE_URL: z.string().url().default('http://localhost:3000'),
+    EMAIL_VERIFICATION_TTL_SECONDS: z.coerce
+        .number()
+        .int()
+        .positive()
+        .default(86400),
     JWT_SECRET: z.string().min(1, 'JWT_SECRET is required'),
     JWT_EXPIRES_IN: z.string().default('15m'),
     REFRESH_TOKEN_TTL_SECONDS: z.coerce

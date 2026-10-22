@@ -259,6 +259,10 @@ REFRESH_COOKIE_NAME=refresh_token
 REFRESH_COOKIE_SAME_SITE=lax
 REFRESH_COOKIE_SECURE=false
 CORS_ORIGINS=http://localhost:3000
+RESEND_API_KEY=re_...
+RESEND_FROM_EMAIL="Corestack <no-reply@example.com>"
+API_BASE_URL=http://localhost:3000
+EMAIL_VERIFICATION_TTL_SECONDS=86400
 ```
 
 `JWT_SECRET` is required. In production, `REFRESH_COOKIE_SECURE` must be `true`; it must also be `true` when `REFRESH_COOKIE_SAME_SITE=none`.
@@ -267,7 +271,11 @@ CORS_ORIGINS=http://localhost:3000
 
 Authentication routes are mounted under `/api/v1/auth`:
 
-- `POST /register` validates and creates a user; passwords are hashed with Argon2.
+- `POST /register` validates and creates an unverified user and emails a verification link;
+
+- `GET /verify-email?token=...` serves a confirmation page. It does not verify the address; the user must click the page's button, which submits the token via `POST /verify-email`.
+
+- `POST /resend-verification` accepts `{ "email": "..." }` and sends a fresh link when the account exists and is unverified. Its response does not disclose account existence.
 - `POST /login` verifies credentials, checks that the account is active and email-verified, creates a session, and returns an access token. The refresh token is sent in an HTTP-only cookie.
 - `POST /refresh` rotates the refresh token and returns a new access token. It requires a trusted `Origin` configured in `CORS_ORIGINS`.
 - `POST /logout` revokes the session represented by the refresh cookie and clears the cookie. It also requires a trusted `Origin`.

@@ -46,6 +46,59 @@ export class PrismaAuthRepository implements AuthRepository {
         }
     }
 
+    async createEmailVerificationToken(input: {
+        userId: string
+        tokenHash: string
+        expiresAt: Temporal.Instant
+        createdAt: Temporal.Instant
+    }): Promise<void> {
+        await db.transaction(async (tx) => {
+            await tx.execute(
+                tx.sql.auth.email_verification_tokens
+                    .update({ consumedAt: input.createdAt })
+                    .where((fields, fns) => fns.eq(fields.userId, input.userId))
+                    .where((fields, fns) => fns.eq(fields.consumedAt, null))
+                    .build(),
+            )
+            await tx.orm.auth.EmailVerificationToken.create({
+                userId: input.userId,
+                tokenHash: input.tokenHash,
+                expiresAt: input.expiresAt,
+            })
+        })
+    }
+
+    async verifyEmail(
+        tokenHash: string,
+        now: Temporal.Instant,
+    ): Promise<boolean> {
+        return db.transaction(async (tx) => {
+            const consumed = await tx.query(
+                tx.sql.auth.email_verification_tokens
+                    .update({ consumedAt: now })
+                    .where((fields, fns) => fns.eq(fields.tokenHash, tokenHash))
+                    .where((fields, fns) => fns.eq(fields.consumedAt, null))
+                    .where((fields, fns) => fns.gt(fields.expiresAt, now))
+                    .returning('userId')
+                    .build(),
+            )
+            if (consumed.length === 0) return false
+
+            await tx.execute(
+                tx.sql.auth.users
+                    .update({ emailVerifiedAt: now })
+                    .where((fields, fns) =>
+                        fns.eq(fields.id, consumed[0]!.userId),
+                    )
+                    .where((fields, fns) =>
+                        fns.eq(fields.emailVerifiedAt, null),
+                    )
+                    .build(),
+            )
+            return true
+        })
+    }
+
     async createSession(input: CreateSessionInput): Promise<void> {
         await db.transaction(async (tx) => {
             const session = await tx.orm.auth.Session.create({

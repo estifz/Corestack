@@ -9,6 +9,11 @@ import {
 } from '../../utils/errors/appError.js'
 import { signAccessToken } from '../../utils/jwt.js'
 import { createRefreshToken, hashRefreshToken } from './refresh-token.js'
+import {
+    createEmailVerificationToken,
+    hashEmailVerificationToken,
+} from './email-verification-token.js'
+import { sendVerificationEmail } from './auth.email.js'
 import type { AuthRepository } from './auth.repository.js'
 import type {
     AuthUser,
@@ -31,10 +36,42 @@ export class AuthService {
         }
 
         const passwordHash = await argon2.hash(input.password)
-        return this.repository.createUser({
+        const user = await this.repository.createUser({
             email: normalizedEmail,
             passwordHash,
         })
+        await this.issueEmailVerification(user.id, user.email)
+        return user
+    }
+
+    async verifyEmail(token: string): Promise<boolean> {
+        return this.repository.verifyEmail(
+            hashEmailVerificationToken(token),
+            Temporal.Now.instant(),
+        )
+    }
+
+    async resendVerificationEmail(email: string): Promise<void> {
+        const user = await this.repository.findUserByEmail(
+            email.trim().toLowerCase(),
+        )
+        if (!user || user.emailVerifiedAt) return
+        await this.issueEmailVerification(user.id, user.email)
+    }
+
+    private async issueEmailVerification(userId: string, email: string) {
+        const { token, tokenHash } = createEmailVerificationToken()
+        const createdAt = Temporal.Now.instant()
+        const expiresAt = createdAt.add({
+            seconds: ENV.EMAIL_VERIFICATION_TTL_SECONDS,
+        })
+        await this.repository.createEmailVerificationToken({
+            userId,
+            tokenHash,
+            expiresAt,
+            createdAt,
+        })
+        await sendVerificationEmail(email, token)
     }
 
     async login(

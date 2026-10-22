@@ -13,3 +13,11 @@ export const loginUserSchema = z.object({
 })
 
 export type LoginUserBody = z.infer<typeof loginUserSchema>
+
+export const verifyEmailSchema = z.object({
+    token: z.string().regex(/^[A-Za-z0-9_-]{40,50}$/),
+})
+
+export const resendVerificationEmailSchema = z.object({
+    email: z.email(),
+})

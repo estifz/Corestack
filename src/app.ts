@@ -22,7 +22,12 @@ app.use(helmet())
 app.use(compression())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-app.use(morgan('dev'))
+app.use(
+    morgan('dev', {
+        skip: (req) =>
+            req.method === 'GET' && req.path === '/api/v1/auth/verify-email',
+    }),
+)
 app.use(limiter)
 
 app.use(healthRoutes)

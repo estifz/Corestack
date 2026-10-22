@@ -1,7 +1,12 @@
 import type { Request, Response } from 'express'
 import { UnauthorizedError } from '../../utils/errors/appError.js'
 import type { AuthService } from './auth.service.js'
-import { loginUserSchema, registerUserSchema } from './auth.validation.js'
+import {
+    loginUserSchema,
+    registerUserSchema,
+    resendVerificationEmailSchema,
+    verifyEmailSchema,
+} from './auth.validation.js'
 import {
     clearRefreshCookie,
     readRefreshToken,
@@ -17,7 +22,63 @@ export class AuthController {
 
         res.status(201).json({
             success: true,
+            message: 'Check your email for a verification link.',
             user,
+        })
+    }
+
+    async showEmailVerification(req: Request, res: Response) {
+        res.set({
+            'Cache-Control': 'no-store',
+            'Referrer-Policy': 'no-referrer',
+        })
+        const token = verifyEmailSchema.shape.token.safeParse(req.query.token)
+        if (!token.success) {
+            return res
+                .status(400)
+                .type('html')
+                .send(
+                    verificationPage(
+                        'This verification link is invalid or incomplete.',
+                        null,
+                    ),
+                )
+        }
+        return res.type('html').send(verificationPage(null, token.data))
+    }
+
+    async verifyEmail(req: Request, res: Response) {
+        const { token } = verifyEmailSchema.parse(req.body)
+        const verified = await this.service.verifyEmail(token)
+        if (!verified) {
+            return res
+                .status(400)
+                .type('html')
+                .send(
+                    verificationPage(
+                        'This link is invalid, expired, or already used.',
+                        null,
+                    ),
+                )
+        }
+        return res
+            .status(200)
+            .type('html')
+            .send(
+                verificationPage(
+                    'Your email has been verified. You can now sign in.',
+                    null,
+                ),
+            )
+    }
+
+    async resendVerificationEmail(req: Request, res: Response) {
+        const { email } = resendVerificationEmailSchema.parse(req.body)
+        await this.service.resendVerificationEmail(email)
+        res.status(202).json({
+            success: true,
+            message:
+                'If the account needs verification, a link will be sent shortly.',
         })
     }
 
@@ -80,4 +141,13 @@ export class AuthController {
             user,
         })
     }
+}
+
+function verificationPage(message: string | null, token: string | null) {
+    const form = token
+        ? `<form method="post" action="/api/v1/auth/verify-email"><input type="hidden" name="token" value="${token}"><button type="submit">Verify my email</button></form>`
+        : ''
+    const content =
+        message ?? 'Confirm that you want to verify this email address.'
+    return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Email verification</title><style>body{font:16px system-ui,sans-serif;max-width:36rem;margin:12vh auto;padding:0 1.25rem;color:#18212f}button{font:inherit;padding:.7rem 1rem;background:#155eef;color:white;border:0;border-radius:.4rem;cursor:pointer}</style></head><body><main><h1>Email verification</h1><p>${content}</p>${form}</main></body></html>`
 }
