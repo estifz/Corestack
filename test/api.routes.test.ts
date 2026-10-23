@@ -45,6 +45,18 @@ describe('HTTP API', () => {
         expect(response.status).toBe(401)
     })
 
+    it('forbids non-admin users from retrieving a user by id', async () => {
+        const userToken = await signAccessToken({
+            userId: 'regular-user',
+            role: 'USER',
+        })
+        const response = await request(app)
+            .get('/users/user-123')
+            .set('Authorization', `Bearer ${userToken}`)
+        expect(response.status).toBe(403)
+        expect(response.body.code).toBe('FORBIDDEN')
+    })
+
     it('validates password reset payload before reaching persistence', async () => {
         const response = await request(app)
             .post('/api/v1/auth/reset-password')

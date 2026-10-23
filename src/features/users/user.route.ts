@@ -11,6 +11,11 @@ router.get(
     userController.listUsers.bind(userController),
 )
 
-router.get('/:id', authenticate, userController.getUser.bind(userController))
+router.get(
+    '/:id',
+    authenticate,
+    authorize('ADMIN'),
+    userController.getUser.bind(userController),
+)
 
 export default router
