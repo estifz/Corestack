@@ -64,4 +64,14 @@ describe('HTTP API', () => {
         expect(response.status).toBe(400)
         expect(response.body.code).toBe('VALIDATION_ERROR')
     })
+
+    it('returns a structured JSON error when route is not found', async () => {
+        const response = await request(app).get('/api/v1/unknown-endpoint')
+        expect(response.status).toBe(404)
+        expect(response.body).toEqual({
+            success: false,
+            code: 'NOT_FOUND',
+            message: 'Route not found',
+        })
+    })
 })

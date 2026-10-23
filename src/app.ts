@@ -9,6 +9,7 @@ import helmet from 'helmet'
 import compression from 'compression'
 import cors from 'cors'
 import { ENV } from './config/env.js'
+import { NotFoundError } from './utils/errors/appError.js'
 
 const app = express()
 
@@ -33,6 +34,11 @@ app.use(limiter)
 app.use(healthRoutes)
 app.use('/api/v1/auth', authRoutes)
 app.use('/api/v1/users', userRoutes)
+
+app.use((_req, _res, next) => {
+    next(new NotFoundError('Route not found'))
+})
+
 app.use(errorHandler)
 
 export default app
