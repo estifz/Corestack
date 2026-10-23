@@ -295,6 +295,13 @@ Authentication routes are mounted under `/api/v1/auth`:
 - `POST /logout` revokes the session represented by the refresh cookie and clears the cookie. It also requires a trusted `Origin`.
 - `GET /me` returns the current user and requires `Authorization: Bearer <access-token>`.
 
+### Users & Administration
+
+User management routes are mounted under `/users`:
+
+- `GET /users` — Returns a paginated list of all registered users and the total count (`?limit=20&offset=0`). **Protected: Requires `ADMIN` role.**
+- `GET /users/:id` — Retrieves a user profile by ID (excludes password hashes). **Protected: Requires authentication.**
+
 ### Database
 
 - Prisma 8 contract-based PostgreSQL setup.
