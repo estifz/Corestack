@@ -24,7 +24,7 @@ describe('HTTP API', () => {
     })
 
     it('protects the list-users endpoint from unauthenticated requests', async () => {
-        const response = await request(app).get('/users')
+        const response = await request(app).get('/api/v1/users')
         expect(response.status).toBe(401)
     })
 
@@ -34,14 +34,14 @@ describe('HTTP API', () => {
             role: 'USER',
         })
         const response = await request(app)
-            .get('/users')
+            .get('/api/v1/users')
             .set('Authorization', `Bearer ${userToken}`)
         expect(response.status).toBe(403)
         expect(response.body.code).toBe('FORBIDDEN')
     })
 
     it('protects the user-by-id endpoint', async () => {
-        const response = await request(app).get('/users/user-123')
+        const response = await request(app).get('/api/v1/users/user-123')
         expect(response.status).toBe(401)
     })
 
@@ -51,7 +51,7 @@ describe('HTTP API', () => {
             role: 'USER',
         })
         const response = await request(app)
-            .get('/users/user-123')
+            .get('/api/v1/users/user-123')
             .set('Authorization', `Bearer ${userToken}`)
         expect(response.status).toBe(403)
         expect(response.body.code).toBe('FORBIDDEN')

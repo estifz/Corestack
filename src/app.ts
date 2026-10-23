@@ -32,7 +32,7 @@ app.use(limiter)
 
 app.use(healthRoutes)
 app.use('/api/v1/auth', authRoutes)
-app.use('/users', userRoutes)
+app.use('/api/v1/users', userRoutes)
 app.use(errorHandler)
 
 export default app

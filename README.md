@@ -297,10 +297,10 @@ Authentication routes are mounted under `/api/v1/auth`:
 
 ### Users & Administration
 
-User management routes are mounted under `/users`:
+User management routes are mounted under `/api/v1/users`:
 
-- `GET /users` — Returns a paginated list of all registered users and the total count (`?limit=20&offset=0`). **Protected: Requires `ADMIN` role.**
-- `GET /users/:id` — Retrieves a user profile by ID (excludes password hashes). **Protected: Requires `ADMIN` role.**
+- `GET /api/v1/users` — Returns a paginated list of all registered users and the total count (`?limit=20&offset=0`). **Protected: Requires `ADMIN` role.**
+- `GET /api/v1/users/:id` — Retrieves a user profile by ID (excludes password hashes). **Protected: Requires `ADMIN` role.**
 
 ### Database
 
