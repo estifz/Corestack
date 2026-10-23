@@ -73,6 +73,8 @@ Storage, queues, and other reusable modules remain future work.
 | [lint-staged](https://github.com/lint-staged/lint-staged) | Pre-commit Checks                         |
 | [Prisma ORM](https://www.prisma.io/)                      | Prisma 8 contract-based PostgreSQL access |
 | [PostgreSQL](https://www.postgresql.org/)                 | Relational database                       |
+| [Vitest](https://vitest.dev/)                             | Unit and integration testing              |
+| [Supertest](https://github.com/ladjs/supertest)           | Express HTTP testing                      |
 
 ---
 
@@ -325,6 +327,18 @@ Start the development server:
 ```bash
 pnpm dev
 ```
+
+### Tests
+
+Run the unit and HTTP tests with:
+
+```bash
+pnpm test
+```
+
+For the PostgreSQL readiness integration test, set `TEST_DATABASE_URL` to a dedicated test database URL before running the suite. The integration test only runs a read-only readiness query and closes its Prisma client when finished. Watch tests during development with `pnpm test:watch`.
+
+Vitest 5 requires Node.js 22.12 or later; this repository pins Node.js 24.18 in `.tool-versions`.
 
 ### Production
 
