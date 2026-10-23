@@ -1,14 +1,10 @@
-// Should be put on separate file 'user.repository.ts'
-export interface userRepository {
-    getUser(id: string): Promise<string>
-}
+import type {
+    ListUsersQueryInput,
+    ListUsersResult,
+    UserProfile,
+} from './user.types.js'
 
-//Should be put on separate file 'prisma-user.repository.ts'
-export class PrismaUserRepository implements userRepository {
-    async getUser(id: string) {
-        return `This is Prisma repository ${id}`
-    }
+export interface UserRepository {
+    getUser(id: string): Promise<UserProfile | null>
+    listUsers(params: ListUsersQueryInput): Promise<ListUsersResult>
 }
-
-// To transition to mongodb
-// export class MongoUserRepository implements userRepository {}
