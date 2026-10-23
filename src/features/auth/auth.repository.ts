@@ -18,6 +18,17 @@ export interface AuthRepository {
         createdAt: Temporal.Instant
     }): Promise<void>
     verifyEmail(tokenHash: string, now: Temporal.Instant): Promise<boolean>
+    createPasswordResetToken(input: {
+        userId: string
+        tokenHash: string
+        expiresAt: Temporal.Instant
+        createdAt: Temporal.Instant
+    }): Promise<void>
+    resetPassword(input: {
+        tokenHash: string
+        newPasswordHash: string
+        now: Temporal.Instant
+    }): Promise<boolean>
     createSession(input: CreateSessionInput): Promise<void>
     rotateRefreshToken(
         input: RotateRefreshTokenInput,

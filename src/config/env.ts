@@ -20,6 +20,7 @@ const envSchema = z.object({
         .int()
         .positive()
         .default(86400),
+    PASSWORD_RESET_TTL_SECONDS: z.coerce.number().int().positive().default(900),
     JWT_SECRET: z.string().min(1, 'JWT_SECRET is required'),
     JWT_EXPIRES_IN: z.string().default('15m'),
     REFRESH_TOKEN_TTL_SECONDS: z.coerce

@@ -21,4 +21,12 @@ describe('HTTP API', () => {
         const response = await request(app).get('/api/v1/auth/me')
         expect(response.status).toBe(401)
     })
+
+    it('validates password reset payload before reaching persistence', async () => {
+        const response = await request(app)
+            .post('/api/v1/auth/reset-password')
+            .send({ token: 'short', password: 'short' })
+        expect(response.status).toBe(400)
+        expect(response.body.code).toBe('VALIDATION_ERROR')
+    })
 })

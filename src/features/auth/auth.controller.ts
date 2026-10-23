@@ -2,9 +2,11 @@ import type { Request, Response } from 'express'
 import { UnauthorizedError } from '../../utils/errors/appError.js'
 import type { AuthService } from './auth.service.js'
 import {
+    forgotPasswordSchema,
     loginUserSchema,
     registerUserSchema,
     resendVerificationEmailSchema,
+    resetPasswordSchema,
     verifyEmailSchema,
 } from './auth.validation.js'
 import {
@@ -79,6 +81,26 @@ export class AuthController {
             success: true,
             message:
                 'If the account needs verification, a link will be sent shortly.',
+        })
+    }
+
+    async forgotPassword(req: Request, res: Response) {
+        const { email } = forgotPasswordSchema.parse(req.body)
+        await this.service.forgotPassword(email)
+        res.status(200).json({
+            success: true,
+            message:
+                'If an account with that email exists, a password reset link has been sent.',
+        })
+    }
+
+    async resetPassword(req: Request, res: Response) {
+        const { token, password } = resetPasswordSchema.parse(req.body)
+        await this.service.resetPassword(token, password)
+        res.status(200).json({
+            success: true,
+            message:
+                'Password has been reset successfully. You can now sign in with your new password.',
         })
     }
 

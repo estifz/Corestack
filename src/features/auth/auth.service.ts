@@ -2,6 +2,7 @@ import argon2 from 'argon2'
 import { Temporal } from 'temporal-polyfill/full'
 import { ENV } from '../../config/env.js'
 import {
+    BadRequestError,
     ConflictError,
     ForbiddenError,
     NotFoundError,
@@ -13,7 +14,11 @@ import {
     createEmailVerificationToken,
     hashEmailVerificationToken,
 } from './email-verification-token.js'
-import { sendVerificationEmail } from './auth.email.js'
+import {
+    createPasswordResetToken,
+    hashPasswordResetToken,
+} from './password-reset-token.js'
+import { sendPasswordResetEmail, sendVerificationEmail } from './auth.email.js'
 import type { AuthRepository } from './auth.repository.js'
 import type {
     AuthUser,
@@ -72,6 +77,46 @@ export class AuthService {
             createdAt,
         })
         await sendVerificationEmail(email, token)
+    }
+
+    async forgotPassword(email: string): Promise<void> {
+        const normalizedEmail = email.trim().toLowerCase()
+        const user = await this.repository.findUserByEmail(normalizedEmail)
+
+        if (!user || !user.isActive) {
+            return
+        }
+
+        const { token, tokenHash } = createPasswordResetToken()
+        const createdAt = Temporal.Now.instant()
+        const expiresAt = createdAt.add({
+            seconds: ENV.PASSWORD_RESET_TTL_SECONDS,
+        })
+
+        await this.repository.createPasswordResetToken({
+            userId: user.id,
+            tokenHash,
+            expiresAt,
+            createdAt,
+        })
+
+        await sendPasswordResetEmail(user.email, token)
+    }
+
+    async resetPassword(token: string, newPassword: string): Promise<void> {
+        const tokenHash = hashPasswordResetToken(token)
+        const newPasswordHash = await argon2.hash(newPassword)
+        const now = Temporal.Now.instant()
+
+        const success = await this.repository.resetPassword({
+            tokenHash,
+            newPasswordHash,
+            now,
+        })
+
+        if (!success) {
+            throw new BadRequestError('Invalid or expired password reset token')
+        }
     }
 
     async login(

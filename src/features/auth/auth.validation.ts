@@ -21,3 +21,16 @@ export const verifyEmailSchema = z.object({
 export const resendVerificationEmailSchema = z.object({
     email: z.email(),
 })
+
+export const forgotPasswordSchema = z.object({
+    email: z.email(),
+})
+
+export type ForgotPasswordBody = z.infer<typeof forgotPasswordSchema>
+
+export const resetPasswordSchema = z.object({
+    token: z.string().regex(/^[A-Za-z0-9_-]{40,50}$/, 'Invalid token format'),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
+})
+
+export type ResetPasswordBody = z.infer<typeof resetPasswordSchema>
