@@ -3,6 +3,7 @@ import morgan from 'morgan'
 import userRoutes from './features/users/user.route.js'
 import authRoutes from './features/auth/auth.route.js'
 import healthRoutes from './features/health/health.route.js'
+import docsRoutes from './docs/docs.route.js'
 import { errorHandler } from './middlewares/errorHandler.js'
 import { limiter } from './middlewares/rateLimiter.js'
 import helmet from 'helmet'
@@ -32,6 +33,7 @@ app.use(
 app.use(limiter)
 
 app.use(healthRoutes)
+app.use(docsRoutes)
 app.use('/api/v1/auth', authRoutes)
 app.use('/api/v1/users', userRoutes)
 

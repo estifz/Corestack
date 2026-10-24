@@ -302,6 +302,13 @@ User management routes are mounted under `/api/v1/users`:
 - `GET /api/v1/users` — Returns a paginated list of all registered users and the total count (`?limit=20&offset=0`). **Protected: Requires `ADMIN` role.**
 - `GET /api/v1/users/:id` — Retrieves a user profile by ID (excludes password hashes). **Protected: Requires `ADMIN` role.**
 
+### API Documentation
+
+Interactive API documentation is powered by **Scalar** and available out of the box:
+
+- **Interactive UI**: `GET /docs` — Live interactive API reference with light/dark theme, instant request tester, and generated code snippets (JavaScript, Python, cURL, etc.).
+- **OpenAPI 3.1 Spec**: `GET /openapi.json` — Raw JSON specification for importing into Postman, Insomnia, or generating frontend SDKs.
+
 ### Database
 
 - Prisma 8 contract-based PostgreSQL setup.

@@ -1,0 +1,100 @@
+### CoreStack API - In-Editor Request Collection
+### Use with VS Code REST Client extension, JetBrains HTTP Client, or Bruno.
+
+@baseUrl = http://localhost:3000
+@contentType = application/json
+
+# Paste your access token here after logging in
+@accessToken = your_jwt_access_token_here
+
+# System Endpoints
+
+### 1. Process Liveness Check
+GET {{baseUrl}}/health
+
+### 2. PostgreSQL Readiness Check
+GET {{baseUrl}}/ready
+
+### 3. Raw OpenAPI Specification
+GET {{baseUrl}}/openapi.json
+
+
+# Authentication Endpoints
+
+### 4. Register User
+POST {{baseUrl}}/api/v1/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "developer@example.com",
+  "password": "SuperSecretPassword123!"
+}
+
+### 5. Verify Email (Two-Step: Landing Page -> Submission)
+POST {{baseUrl}}/api/v1/auth/verify-email
+Content-Type: {{contentType}}
+
+{
+  "token": "your_verification_token_here"
+}
+
+### 6. Resend Verification Email
+POST {{baseUrl}}/api/v1/auth/resend-verification
+Content-Type: {{contentType}}
+
+{
+  "email": "developer@example.com"
+}
+
+### 7. Login
+POST {{baseUrl}}/api/v1/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "developer@example.com",
+  "password": "SuperSecretPassword123!"
+}
+
+### 8. Refresh Tokens
+POST {{baseUrl}}/api/v1/auth/refresh
+Origin: {{baseUrl}}
+Content-Type: {{contentType}}
+
+### 9. Logout
+POST {{baseUrl}}/api/v1/auth/logout
+Origin: {{baseUrl}}
+Content-Type: {{contentType}}
+
+### 10. Forgot Password (Request Reset Link)
+POST {{baseUrl}}/api/v1/auth/forgot-password
+Content-Type: {{contentType}}
+
+{
+  "email": "developer@example.com"
+}
+
+### 11. Reset Password
+POST {{baseUrl}}/api/v1/auth/reset-password
+Content-Type: {{contentType}}
+
+{
+  "token": "your_password_reset_token_here",
+  "password": "BrandNewSecurePassword123!"
+}
+
+### 12. Current User Profile
+GET {{baseUrl}}/api/v1/auth/me
+Authorization: Bearer {{accessToken}}
+
+
+# Users Management (Admin Role Required)
+
+### 13. List All Users (Paginated)
+GET {{baseUrl}}/api/v1/users?limit=10&offset=0
+Authorization: Bearer {{accessToken}}
+
+### 14. Get User By ID
+@targetUserId = your_user_uuid_here
+GET {{baseUrl}}/api/v1/users/{{targetUserId}}
+Authorization: Bearer {{accessToken}}
+
