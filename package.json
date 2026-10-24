@@ -16,7 +16,10 @@
         "contract:emit": "prisma contract emit",
         "migration:plan": "pnpm exec prisma migration plan --name",
         "migration:apply": "pnpm exec prisma db migrate --advance-ref db",
-        "migration:status": "pnpm exec prisma migration status"
+        "migration:status": "pnpm exec prisma migration status",
+        "docker:db": "docker compose up -d postgres",
+        "docker:up": "docker compose up -d",
+        "docker:down": "docker compose down"
     },
     "keywords": [],
     "author": "",

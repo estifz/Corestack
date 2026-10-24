@@ -124,7 +124,10 @@ CoreStack follows a **feature-based architecture** with clear separation between
 │   ├── utils/            # JWT, crypto tokens, and application error classes
 │   ├── app.ts            # Express application setup and routing
 │   └── server.ts         # Server entry point and port listener
-└── test/                 # Vitest unit and HTTP integration tests
+├── test/                 # Vitest unit and HTTP integration tests
+├── .dockerignore         # Docker context exclusion rules
+├── compose.yaml          # Docker Compose service definition (PostgreSQL & App)
+└── Dockerfile            # Multi-stage production container build
 ```
 
 ### Request Flow
@@ -298,7 +301,8 @@ Make sure you have installed:
 
 - [Node.js](https://nodejs.org/) (v22.12 or higher; v24.18 is pinned in `.tool-versions`)
 - [pnpm](https://pnpm.io/) (v10 or higher; configured in `devEngines`)
-- [PostgreSQL](https://www.postgresql.org/) (v16 or higher)
+- [PostgreSQL](https://www.postgresql.org/) (v16 or higher, or Docker)
+- [Docker](https://www.docker.com/) & Docker Compose _(optional, but recommended)_
 
 ### Installation
 
@@ -313,6 +317,50 @@ Install dependencies:
 
 ```bash
 pnpm install
+```
+
+### Docker Support
+
+CoreStack includes complete Docker configuration out of the box for both local development and production.
+
+#### Option A: Run PostgreSQL in Docker (Recommended for Local Dev)
+
+Spin up an isolated PostgreSQL 16 container with persistent storage:
+
+```bash
+pnpm docker:db
+# or
+docker compose up -d postgres
+```
+
+Apply database migrations:
+
+```bash
+pnpm migration:apply
+```
+
+Start the application locally with hot-reloading:
+
+```bash
+pnpm dev
+```
+
+#### Option B: Run Full Stack in Docker (Zero Local Setup)
+
+To build and run both the API and PostgreSQL in isolated containers:
+
+```bash
+docker compose up --build
+```
+
+The API will be available at `http://localhost:3000` with interactive docs at `http://localhost:3000/docs`.
+
+To stop containers:
+
+```bash
+pnpm docker:down
+# or
+docker compose down
 ```
 
 ### Environment Variables
