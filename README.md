@@ -49,6 +49,7 @@ Phase 3 implements an end-to-end, production-grade authentication and user manag
 - **Password Recovery**: Secure forgot-password flow with one-time tokens and reset-password endpoint that updates credentials and revokes all active sessions.
 - **Role-Based Access Control (RBAC) & Users**: Role middleware (`USER`, `ADMIN`), admin-restricted paginated user listing, admin user lookup, and authenticated user profile endpoint (`/api/v1/auth/me`).
 - **Interactive Documentation**: Interactive API reference powered by Scalar at `/docs`, full OpenAPI 3.1 schema at `/openapi.json`, and an in-editor HTTP request collection (`docs/requests.http`).
+- **Containerization & Docker**: Multi-stage production Dockerfile (Alpine-based, BuildKit caching, lean ~109 MB content size), Docker Compose orchestration for PostgreSQL and App, and automated Docker build verification in GitHub Actions CI.
 - **Testing & CI Pipeline**: Vitest test suite with Supertest route coverage, mock repository DIP testing, and a GitHub Actions CI workflow running containerized PostgreSQL on push and PR.
 
 ### Current Scope
@@ -68,6 +69,7 @@ Phase 3 implements an end-to-end, production-grade authentication and user manag
 - Password Recovery (Forgot & reset password with session revocation)
 - Role-Based Access Control (RBAC) & User Management (`USER`, `ADMIN`)
 - Interactive API Documentation (Scalar UI & OpenAPI 3.1 specification)
+- Containerization & Docker Orchestration (Dockerfile, Docker Compose, CI Build Verification)
 - Automated CI/CD Pipeline (GitHub Actions) & Test Suite (Vitest + Supertest)
 
 Object storage, background queues, and other reusable modules remain future work.
@@ -92,6 +94,7 @@ Object storage, background queues, and other reusable modules remain future work
 | [Pino](https://getpino.io/)                               | Structured Logging                        |
 | [Vitest](https://vitest.dev/)                             | Unit and integration testing              |
 | [Supertest](https://github.com/ladjs/supertest)           | Express HTTP testing                      |
+| [Docker](https://www.docker.com/)                         | Containerization & service orchestration  |
 | [Husky](https://typicode.github.io/husky/)                | Git Hooks                                 |
 | [lint-staged](https://github.com/lint-staged/lint-staged) | Pre-commit Checks                         |
 
@@ -281,6 +284,15 @@ This makes components easier to:
 - Mock Repository Pattern for Decoupled Dependency Inversion Testing
 - Automated PostgreSQL Readiness Integration Test
 - GitHub Actions CI Workflow Executing Test Suite on Push & Pull Request
+
+### Containerization & Docker
+
+- Multi-stage Dockerfile (`node:24-alpine`)
+- Non-root `node` user security execution
+- Offline dependency pruning (`pnpm prune --prod`)
+- BuildKit store caching across builds
+- Docker Compose for isolated local PostgreSQL and full-stack services
+- GitHub Actions automated Docker build verification
 
 ### Development Tooling
 
