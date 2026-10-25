@@ -17,7 +17,9 @@
         "migration:plan": "pnpm exec prisma migration plan --name",
         "migration:apply": "pnpm exec prisma db migrate --advance-ref db",
         "migration:status": "pnpm exec prisma migration status",
-        "docker:db": "docker compose up -d postgres",
+        "docker:db:postgres": "docker compose up -d postgres",
+        "docker:db:mongo": "docker compose up -d mongodb mongo-express",
+        "docker:db:all": "docker compose up -d postgres mongodb mongo-express",
         "docker:up": "docker compose up -d",
         "docker:down": "docker compose down"
     },
@@ -51,6 +53,7 @@
         "express-rate-limit": "^8.7.0",
         "helmet": "^8.3.0",
         "jose": "^6.2.12",
+        "mongoose": "^8.12.0",
         "morgan": "^1.11.0",
         "pino": "^10.3.1",
         "resend": "^6.34.1",
