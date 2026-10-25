@@ -16,13 +16,13 @@ Instead of rebuilding the same backend infrastructure for every project, CoreSta
 
 CoreStack is built around a few core principles:
 
-- **Understandability** — Every part of the system should be easy to understand and explain.
-- **Maintainability** — Prefer clear and predictable code over clever abstractions.
-- **Separation of Concerns** — Each layer has a clear responsibility.
-- **Type Safety** — Use TypeScript to catch problems early.
-- **Consistency** — Common problems should have common solutions.
-- **Extensibility** — New project-specific functionality should be easy to add.
-- **Production-minded** — Security, validation, logging, error handling, and reliability are considered from the beginning.
+- **Understandability** - Every part of the system should be easy to understand and explain.
+- **Maintainability** - Prefer clear and predictable code over clever abstractions.
+- **Separation of Concerns** - Each layer has a clear responsibility.
+- **Type Safety** - Use TypeScript to catch problems early.
+- **Consistency** - Common problems should have common solutions.
+- **Extensibility** - New project-specific functionality should be easy to add.
+- **Production-minded** - Security, validation, logging, error handling, and reliability are considered from the beginning.
 
 > CoreStack is not designed to eliminate engineering decisions.
 >
@@ -52,51 +52,53 @@ Phase 3 implements an end-to-end, production-grade authentication and user manag
 - **Containerization & Docker**: Multi-stage production Dockerfile (Alpine-based, BuildKit caching, lean ~109 MB content size), Docker Compose orchestration for PostgreSQL and App, and automated Docker build verification in GitHub Actions CI.
 - **Testing & CI Pipeline**: Vitest test suite with Supertest route coverage, mock repository DIP testing, and a GitHub Actions CI workflow running containerized PostgreSQL on push and PR.
 
-### Current Scope
+### `v0.4.0` — Phase 4: Pluggable Multi-Database Architecture (MongoDB & Mongoose)
 
-- Project Setup & Tooling (TypeScript, pnpm devEngines, Prettier, Husky, lint-staged)
-- Feature-based Architecture & Layer Separation (Routes, Controllers, Services, Repositories)
-- Dependency Injection & Inversion (DIP) with clean test mocking
-- Request & Environment Validation with Zod
-- Centralized Operational & Custom Error Handling
-- Structured Logging with Pino
-- Security & HTTP Middleware (Helmet, CORS, Rate Limiting, Compression, Trusted Origin)
-- Health Checks & Process Liveness (`/health`, `/ready`)
-- Graceful Shutdown & Connection Drain
-- Prisma 8 Contract-based PostgreSQL Persistence & Migrations
-- Authentication & Sessions (Registration, Login, JWTs, Refresh Token Rotation, Logout)
-- Email Verification (Resend transactional emails, anti-enumeration, two-step browser confirmation)
-- Password Recovery (Forgot & reset password with session revocation)
-- Role-Based Access Control (RBAC) & User Management (`USER`, `ADMIN`)
-- Interactive API Documentation (Scalar UI & OpenAPI 3.1 specification)
-- Containerization & Docker Orchestration (Dockerfile, Docker Compose, CI Build Verification)
-- Automated CI/CD Pipeline (GitHub Actions) & Test Suite (Vitest + Supertest)
+Phase 4 introduces pluggable multi-database support to CoreStack, allowing developers to choose between **PostgreSQL (Prisma 8)** and **MongoDB (Mongoose)** without affecting business logic:
 
-Object storage, background queues, and other reusable modules remain future work.
+- **Pluggable Architecture**: Runtime database switching via `DATABASE_PROVIDER=postgres | mongodb`.
+- **Decoupled Repositories**: Complete MongoDB repository implementations (`MongoAuthRepository`, `MongoUserRepository`) satisfying the exact same abstract repository contracts.
+- **Mongoose Data Models**: Strict schemas matching the Prisma contract 1:1 (`User`, `Session`, `RefreshToken`, `EmailVerificationToken`, `PasswordResetToken`) with automatic indexing on startup.
+- **Temporal API Compatibility**: Seamless bi-directional translation between domain `Temporal.Instant` timestamps and MongoDB BSON `Date` storage.
+- **Docker & Web GUI**: Added MongoDB 7.0 container with persistent volumes and **Mongo Express** browser-based administration UI at `http://localhost:8081`.
+- **Adaptive Lifecycle**: Dynamic `/ready` health check and graceful shutdown connection draining for whichever database is active.
+
+### Roadmap & Scope
+
+CoreStack currently covers the complete core foundation: modular feature architecture, security middleware, authentication with session rotation, RBAC, API documentation, pluggable PostgreSQL & MongoDB persistence, Docker orchestration, and automated CI testing.
+
+Future modules planned for CoreStack:
+
+- **Object Storage**: S3-compatible cloud storage adapter (AWS S3, Cloudflare R2, MinIO).
+- **Background Jobs & Queues**: Asynchronous worker processing (BullMQ / Redis).
+- **CLI Scaffolding Tool**: Interactive project generator (`corestack create`) for custom stack selection.
 
 ---
 
 ## Tech Stack
 
-| Technology                                                | Purpose                                   |
-| --------------------------------------------------------- | ----------------------------------------- |
-| [Node.js](https://nodejs.org/)                            | Runtime                                   |
-| [TypeScript](https://www.typescriptlang.org/)             | Programming Language                      |
-| [Express](https://expressjs.com/)                         | HTTP Framework                            |
-| [pnpm](https://pnpm.io/)                                  | Package Manager                           |
-| [Prisma ORM](https://www.prisma.io/)                      | Prisma 8 contract-based PostgreSQL access |
-| [PostgreSQL](https://www.postgresql.org/)                 | Relational database                       |
-| [Argon2](https://github.com/ranisalt/node-argon2)         | Password hashing                          |
-| [jose](https://github.com/panva/jose)                     | JWT signing and verification              |
-| [Resend](https://resend.com/)                             | Transactional email delivery              |
-| [Scalar](https://scalar.com/)                             | Interactive OpenAPI documentation UI      |
-| [Zod](https://zod.dev/)                                   | Validation & Configuration                |
-| [Pino](https://getpino.io/)                               | Structured Logging                        |
-| [Vitest](https://vitest.dev/)                             | Unit and integration testing              |
-| [Supertest](https://github.com/ladjs/supertest)           | Express HTTP testing                      |
-| [Docker](https://www.docker.com/)                         | Containerization & service orchestration  |
-| [Husky](https://typicode.github.io/husky/)                | Git Hooks                                 |
-| [lint-staged](https://github.com/lint-staged/lint-staged) | Pre-commit Checks                         |
+| Technology                                                      | Purpose                                   |
+| --------------------------------------------------------------- | ----------------------------------------- |
+| [Node.js](https://nodejs.org/)                                  | Runtime                                   |
+| [TypeScript](https://www.typescriptlang.org/)                   | Programming Language                      |
+| [Express](https://expressjs.com/)                               | HTTP Framework                            |
+| [pnpm](https://pnpm.io/)                                        | Package Manager                           |
+| [Prisma ORM](https://www.prisma.io/)                            | Prisma 8 contract-based PostgreSQL access |
+| [PostgreSQL](https://www.postgresql.org/)                       | Relational database                       |
+| [MongoDB](https://www.mongodb.com/)                             | Document-based database                   |
+| [Mongoose](https://mongoosejs.com/)                             | MongoDB Object Data Modeling (ODM)        |
+| [Mongo Express](https://github.com/mongo-express/mongo-express) | Web-based MongoDB administration GUI      |
+| [Argon2](https://github.com/ranisalt/node-argon2)               | Password hashing                          |
+| [jose](https://github.com/panva/jose)                           | JWT signing and verification              |
+| [Resend](https://resend.com/)                                   | Transactional email delivery              |
+| [Scalar](https://scalar.com/)                                   | Interactive OpenAPI documentation UI      |
+| [Zod](https://zod.dev/)                                         | Validation & Configuration                |
+| [Pino](https://getpino.io/)                                     | Structured Logging                        |
+| [Vitest](https://vitest.dev/)                                   | Unit and integration testing              |
+| [Supertest](https://github.com/ladjs/supertest)                 | Express HTTP testing                      |
+| [Docker](https://www.docker.com/)                               | Containerization & service orchestration  |
+| [Husky](https://typicode.github.io/husky/)                      | Git Hooks                                 |
+| [lint-staged](https://github.com/lint-staged/lint-staged)       | Pre-commit Checks                         |
 
 ---
 
@@ -122,6 +124,7 @@ CoreStack follows a **feature-based architecture** with clear separation between
 │   │   └── users/
 │   ├── infrastructure/   # External integrations (Resend email service)
 │   ├── middlewares/      # Security, auth, CORS origin, and error middlewares
+│   ├── mongo/            # MongoDB connection, lifecycle, and Mongoose models
 │   ├── prisma/           # Database contract, types, and Prisma client
 │   ├── types/            # TypeScript ambient types and error codes
 │   ├── utils/            # JWT, crypto tokens, and application error classes
@@ -129,7 +132,7 @@ CoreStack follows a **feature-based architecture** with clear separation between
 │   └── server.ts         # Server entry point and port listener
 ├── test/                 # Vitest unit and HTTP integration tests
 ├── .dockerignore         # Docker context exclusion rules
-├── compose.yaml          # Docker Compose service definition (PostgreSQL & App)
+├── compose.yaml          # Docker Compose (PostgreSQL, MongoDB, Mongo Express, App)
 └── Dockerfile            # Multi-stage production container build
 ```
 
@@ -183,128 +186,6 @@ This makes components easier to:
 
 ---
 
-## Included Features
-
-### Project Foundation
-
-- TypeScript Configuration
-- pnpm
-- Feature-based Architecture
-- Development & Production Scripts
-- Environment Configuration
-- Prettier
-- Husky
-- lint-staged
-
-### Application Architecture
-
-- Routes
-- Controllers
-- Services
-- Repositories
-- Dependency Injection
-- Dependency Inversion
-
-### Validation
-
-- Request Validation with Zod
-- Environment Variable Validation with Zod
-- Centralized Validation Handling
-
-### Error Handling
-
-- Centralized Error Handling
-- Custom Application Errors
-- Operational Error Handling
-- Validation Error Handling
-- Unexpected Error Handling
-- Consistent Error Responses
-
-### Logging
-
-- Structured Logging with Pino
-- Log Levels
-- Application Error Logging
-- Production-oriented Logging Foundation
-
-### Security & HTTP
-
-- Helmet Security Headers
-- Rate Limiting (`express-rate-limit`)
-- Trusted Origin Enforcement (`requireTrustedOrigin` for CSRF prevention)
-- CORS with Credentials Support
-- Response Compression
-- JSON & URL-encoded Body Parsing
-- Centralized 404 Not Found Handling
-
-### Reliability
-
-- Health Check Endpoints (`/health` process liveness, `/ready` PostgreSQL readiness)
-- Graceful Shutdown Handling (SIGINT & SIGTERM)
-- Connection Pool Draining & Cleanup
-
-### Authentication & Session Management
-
-- Secure Registration with Argon2 Password Hashing
-- Credential Login with Account Status & Email Verification Enforcement
-- Short-lived Access Tokens (JWT via `jose`, HS256)
-- Stateful Session Management with Request Metadata (IP, User-Agent)
-- Cryptographic Refresh Token Rotation with SHA-256 Hashing at Rest
-- Automatic Replay / Reuse Attack Detection & Immediate Session Invalidation
-- Scoped HTTP-only, SameSite, Secure Cookie Transport
-- Secure Logout with Explicit Session Revocation
-
-### Email Verification & Password Recovery
-
-- Transactional Email Dispatch via Resend Integration
-- Anti-Enumeration Protections Across Registration, Verification & Recovery
-- Safe Two-Step Browser Verification Flow (Interactive Page -> API Submission)
-- Resend Verification Link Endpoint
-- Secure Forgot-Password Trigger with Cryptographic Reset Tokens
-- Password Reset Endpoint with Argon2 Re-hashing and Universal Session Invalidation
-
-### Role-Based Access Control (RBAC) & Users
-
-- Role Hierarchy (`USER`, `ADMIN`)
-- Declarative Role Authorization Middleware (`authenticate`, `authorize`)
-- Admin-restricted Paginated User Directory (`GET /api/v1/users`)
-- Admin-restricted User Profile Lookup by ID (`GET /api/v1/users/:id`)
-- Authenticated Current User Profile Endpoint (`GET /api/v1/auth/me`)
-
-### API Documentation
-
-- Interactive OpenAPI Documentation UI via Scalar (`GET /docs`)
-- Full OpenAPI 3.1 Specification (`GET /openapi.json`)
-- In-Editor HTTP Request Collection (`docs/requests.http`)
-
-### Testing & Continuous Integration
-
-- Vitest Test Runner with Fast Multi-threaded Execution
-- Supertest HTTP Endpoint Integration Testing
-- Mock Repository Pattern for Decoupled Dependency Inversion Testing
-- Automated PostgreSQL Readiness Integration Test
-- GitHub Actions CI Workflow Executing Test Suite on Push & Pull Request
-
-### Containerization & Docker
-
-- Multi-stage Dockerfile (`node:24-alpine`)
-- Non-root `node` user security execution
-- Offline dependency pruning (`pnpm prune --prod`)
-- BuildKit store caching across builds
-- Docker Compose for isolated local PostgreSQL and full-stack services
-- GitHub Actions automated Docker build verification
-
-### Development Tooling
-
-- Prettier
-- Husky
-- lint-staged
-- ESLint
-
-> **Note:** ESLint is currently postponed due to TypeScript 7 compatibility.
-
----
-
 ## Getting Started
 
 ### Prerequisites
@@ -313,7 +194,8 @@ Make sure you have installed:
 
 - [Node.js](https://nodejs.org/) (v22.12 or higher; v24.18 is pinned in `.tool-versions`)
 - [pnpm](https://pnpm.io/) (v10 or higher; configured in `devEngines`)
-- [PostgreSQL](https://www.postgresql.org/) (v16 or higher, or Docker)
+- [PostgreSQL](https://www.postgresql.org/) (v16 or higher, or Docker) _(when using PostgreSQL provider)_
+- [MongoDB](https://www.mongodb.com/) (v7.0 or higher, or Docker) _(when using MongoDB provider)_
 - [Docker](https://www.docker.com/) & Docker Compose _(optional, but recommended)_
 
 ### Installation
@@ -335,21 +217,30 @@ pnpm install
 
 CoreStack includes complete Docker configuration out of the box for both local development and production.
 
-#### Option A: Run PostgreSQL in Docker (Recommended for Local Dev)
+#### Option A: Run Databases in Docker (Recommended for Local Dev)
 
-Spin up an isolated PostgreSQL 16 container with persistent storage:
+Spin up your chosen isolated database container with persistent storage:
 
 ```bash
-pnpm docker:db
-# or
-docker compose up -d postgres
+# Start PostgreSQL (port 5432)
+pnpm docker:db:postgres
+
+# Start MongoDB (port 27017) and Mongo Express Web GUI (port 8081)
+pnpm docker:db:mongo
+
+# Or start both simultaneously
+pnpm docker:db:all
 ```
 
-Apply database migrations:
+> **Web GUI**: When running MongoDB, visit **`http://localhost:8081`** in your browser to access the **Mongo Express** interface for viewing and managing documents directly.
+
+If using PostgreSQL, apply pending migrations:
 
 ```bash
 pnpm migration:apply
 ```
+
+_(MongoDB requires zero migrations; collections and indexes are initialized automatically)._
 
 Start the application locally with hot-reloading:
 
@@ -359,7 +250,7 @@ pnpm dev
 
 #### Option B: Run Full Stack in Docker (Zero Local Setup)
 
-To build and run both the API and PostgreSQL in isolated containers:
+To build and run the API along with database services in isolated containers:
 
 ```bash
 docker compose up --build
@@ -391,8 +282,14 @@ CORS_ORIGINS=http://localhost:3000
 RATE_LIMIT_WINDOW=60000
 RATE_LIMIT_REQUEST=100
 
-# Database
+# Database Provider ('postgres' | 'mongodb')
+DATABASE_PROVIDER=postgres
+
+# PostgreSQL Connection (used when DATABASE_PROVIDER=postgres)
 DATABASE_URL="postgresql://postgres:password@localhost:5432/corestack"
+
+# MongoDB Connection (used when DATABASE_PROVIDER=mongodb)
+MONGODB_URI="mongodb://localhost:27017/corestack"
 
 # Authentication & Tokens
 JWT_SECRET="replace-with-a-long-random-secret-at-least-32-chars"
@@ -444,20 +341,24 @@ Interactive API documentation is powered by **Scalar** and available out of the 
 - **OpenAPI 3.1 Spec**: `GET /openapi.json` — Raw JSON specification for importing into Postman, Insomnia, or generating frontend SDKs.
 - **In-Editor Requests**: [`docs/requests.http`](docs/requests.http) — Pre-configured request collection for testing endpoints directly in VS Code (REST Client), JetBrains HTTP Client, or Bruno.
 
-### Database
+### Database & Persistence
 
-- Prisma 8 contract-based PostgreSQL setup.
-- The auth contract defines `User`, `Session`, `RefreshToken`, `EmailVerificationToken`, and `PasswordResetToken` models.
-- Generated contract metadata and TypeScript types are checked in.
-- PostgreSQL readiness check and database connection cleanup during shutdown.
+CoreStack features a **pluggable database architecture** supporting both **PostgreSQL** and **MongoDB**. You can choose your preferred provider in `.env`:
 
-The contract is defined in [`src/prisma/contract.prisma`](src/prisma/contract.prisma).
+```env
+DATABASE_PROVIDER=postgres # or 'mongodb'
+```
 
-### Prisma and PostgreSQL
+Both providers implement identical contracts for `AuthRepository` and `UserRepository`. Services and controllers remain completely database-agnostic.
 
-The project uses Prisma 8's contract workflow with PostgreSQL. Environment variables are validated with Zod at startup.
+#### 1. PostgreSQL & Prisma 8
 
-After changing the contract, regenerate the checked-in contract artifacts:
+The PostgreSQL path uses Prisma 8's contract workflow with strict typed schema definitions:
+
+- **Contract Definition**: [`src/prisma/contract.prisma`](src/prisma/contract.prisma)
+- **Database Client**: Exported from [`src/prisma/db.ts`](src/prisma/db.ts)
+
+After editing the contract schema, regenerate the contract artifacts:
 
 ```bash
 pnpm contract:emit
@@ -486,24 +387,28 @@ pnpm migration:status
 pnpm migration:show
 ```
 
-The application database client is exported from [`src/prisma/db.ts`](src/prisma/db.ts). Use this client from repositories and services rather than creating a separate Prisma client instance.
+#### 2. MongoDB & Mongoose
 
-The health endpoints are:
+The MongoDB path uses Mongoose with schemas matching the Prisma contract 1:1:
+
+- **Database Client & Lifecycle**: Exported from [`src/mongo/db.ts`](src/mongo/db.ts)
+- **Mongoose Models**: Located in [`src/mongo/models/`](src/mongo/models/) (`User`, `Session`, `RefreshToken`, `EmailVerificationToken`, `PasswordResetToken`)
+- **Zero-Migration Setup**: Collections and indexes (such as unique constraints on `email` and `tokenHash`) are initialized automatically by Mongoose upon application boot.
+- **Web Administration**: Visit **`http://localhost:8081`** when running Docker to access the **Mongo Express** GUI.
+
+#### Health Checks & Lifecycle
 
 ```text
 GET /health  # process liveness
-GET /ready   # PostgreSQL readiness
+GET /ready   # database readiness (PostgreSQL SELECT 1 or MongoDB admin ping)
 ```
 
-`/ready` executes `SELECT 1` against PostgreSQL and returns `503` when the database is unavailable.
-On `SIGINT` or `SIGTERM`, the server stops accepting requests, closes the HTTP server, and closes
-the PostgreSQL connection.
+`/ready` dynamically verifies connectivity for whichever database provider is active:
 
-Start the development server:
+- When using PostgreSQL, it executes `SELECT 1`.
+- When using MongoDB, it runs `db.admin().ping()`.
 
-```bash
-pnpm dev
-```
+On `SIGINT` or `SIGTERM`, graceful shutdown closes the HTTP server and cleanly drains database connections for the active provider.
 
 ### Tests
 
