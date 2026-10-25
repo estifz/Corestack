@@ -6,5 +6,5 @@ import { ENV } from '../config/env.js'
 
 export const db = postgres<Contract>({
     contractJson,
-    url: ENV.DATABASE_URL,
+    ...(ENV.DATABASE_URL ? { url: ENV.DATABASE_URL } : {}),
 })

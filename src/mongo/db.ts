@@ -10,6 +10,10 @@ export const mongoDb = {
             return mongoose
         }
 
+        if (!ENV.MONGODB_URI) {
+            throw new Error('MONGODB_URI is required to connect to MongoDB')
+        }
+
         try {
             await mongoose.connect(ENV.MONGODB_URI)
             isConnected = true
