@@ -80,8 +80,15 @@ export async function updatePackageJson(
 
     await fs.writeJson(pkgPath, pkg, { spaces: 4 })
 
-    // Clean up pnpm-workspace if present in copied template
-    if (packageManager !== 'pnpm') {
-        await fs.remove(path.join(targetDir, 'pnpm-workspace.yaml'))
+    // Configure pnpm allowBuilds for native argon2 if pnpm + auth
+    const workspaceYamlPath = path.join(targetDir, 'pnpm-workspace.yaml')
+    if (packageManager === 'pnpm' && auth) {
+        await fs.writeFile(
+            workspaceYamlPath,
+            'allowBuilds:\n    argon2: true\n',
+            'utf-8',
+        )
+    } else {
+        await fs.remove(workspaceYamlPath)
     }
 }

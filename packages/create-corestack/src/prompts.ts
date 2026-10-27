@@ -48,8 +48,32 @@ export async function runPrompts(
 
     const targetDir = path.resolve(process.cwd(), projectName)
 
-    // Check if non-interactive defaults or all flags provided
-    if (flags.yes) {
+    // Validate flags if provided
+    if (flags.database && !['postgres', 'mongodb'].includes(flags.database)) {
+        throw new Error(
+            `Invalid database provider "${flags.database}". Allowed values: postgres, mongodb`,
+        )
+    }
+
+    if (
+        flags.packageManager &&
+        !['pnpm', 'npm', 'yarn', 'bun'].includes(flags.packageManager)
+    ) {
+        throw new Error(
+            `Invalid package manager "${flags.packageManager}". Allowed values: pnpm, npm, yarn, bun`,
+        )
+    }
+
+    const hasExplicitFlags =
+        flags.yes ||
+        flags.database !== undefined ||
+        flags.auth !== undefined ||
+        flags.docs !== undefined ||
+        flags.docker !== undefined ||
+        flags.packageManager !== undefined
+
+    // Non-interactive mode when flags are provided
+    if (hasExplicitFlags) {
         return {
             projectName,
             targetDir,

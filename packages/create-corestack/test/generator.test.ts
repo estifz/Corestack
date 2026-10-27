@@ -396,4 +396,77 @@ describe('create-corestack generator', () => {
         expect(bunCi).toContain('bun test')
         expect(bunCi).toContain('mongodb:')
     })
+
+    it('Scenario 6: pnpm-workspace.yaml configuration for native argon2', async () => {
+        const pnpmDir = path.join(TEST_DIR, 'pnpm-auth')
+        await generateProject({
+            projectName: 'pnpm-auth',
+            targetDir: pnpmDir,
+            database: 'postgres',
+            auth: true,
+            docs: true,
+            docker: true,
+            packageManager: 'pnpm',
+            git: false,
+            install: false,
+        })
+        expect(
+            await fs.pathExists(path.join(pnpmDir, 'pnpm-workspace.yaml')),
+        ).toBe(true)
+        const pnpmWs = await fs.readFile(
+            path.join(pnpmDir, 'pnpm-workspace.yaml'),
+            'utf-8',
+        )
+        expect(pnpmWs).toContain('argon2: true')
+
+        const npmDir = path.join(TEST_DIR, 'npm-auth')
+        await generateProject({
+            projectName: 'npm-auth',
+            targetDir: npmDir,
+            database: 'postgres',
+            auth: true,
+            docs: true,
+            docker: true,
+            packageManager: 'npm',
+            git: false,
+            install: false,
+        })
+        expect(
+            await fs.pathExists(path.join(npmDir, 'pnpm-workspace.yaml')),
+        ).toBe(false)
+    })
+
+    it('Scenario 7: Custom PostgreSQL + Auth + No Docs + No Docker', async () => {
+        const targetDir = path.join(TEST_DIR, 'pg-nodocs-nodocker')
+        await generateProject({
+            projectName: 'pg-nodocs-nodocker',
+            targetDir,
+            database: 'postgres',
+            auth: true,
+            docs: false,
+            docker: false,
+            packageManager: 'pnpm',
+            git: false,
+            install: false,
+        })
+        expect(await fs.pathExists(path.join(targetDir, 'src/docs'))).toBe(
+            false,
+        )
+        expect(await fs.pathExists(path.join(targetDir, 'Dockerfile'))).toBe(
+            false,
+        )
+        expect(await fs.pathExists(path.join(targetDir, 'compose.yaml'))).toBe(
+            false,
+        )
+        expect(
+            await fs.pathExists(path.join(targetDir, 'src/features/auth')),
+        ).toBe(true)
+
+        const appTs = await fs.readFile(
+            path.join(targetDir, 'src/app.ts'),
+            'utf-8',
+        )
+        expect(appTs).not.toContain('docsRoutes')
+        expect(appTs).toContain('authRoutes')
+    })
 })
