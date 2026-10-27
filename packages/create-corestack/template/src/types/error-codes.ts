@@ -1,0 +1,8 @@
+export type ErrorCode =
+    | 'NOT_FOUND'
+    | 'VALIDATION_ERROR'
+    | 'UNAUTHORIZED'
+    | 'FORBIDDEN'
+    | 'RESOURCE_ALREADY_EXISTS'
+    | 'BAD_REQUEST'
+    | 'RATE_LIMIT_EXCEEDED'

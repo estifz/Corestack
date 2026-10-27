@@ -1,0 +1,723 @@
+[
+    {
+        "id": "schema.auth",
+        "label": "Create schema \"auth\"",
+        "operationClass": "additive",
+        "target": {
+            "id": "postgres"
+        },
+        "precheck": [],
+        "execute": [
+            {
+                "description": "Create schema \"auth\"",
+                "sql": "CREATE SCHEMA IF NOT EXISTS \"auth\"",
+                "params": []
+            }
+        ],
+        "postcheck": []
+    },
+    {
+        "id": "schema.public",
+        "label": "Create schema \"public\"",
+        "operationClass": "additive",
+        "target": {
+            "id": "postgres"
+        },
+        "precheck": [],
+        "execute": [
+            {
+                "description": "Create schema \"public\"",
+                "sql": "CREATE SCHEMA IF NOT EXISTS \"public\"",
+                "params": []
+            }
+        ],
+        "postcheck": []
+    },
+    {
+        "id": "table.email_verification_tokens",
+        "label": "Create table \"email_verification_tokens\"",
+        "summary": "Creates table \"email_verification_tokens\"",
+        "operationClass": "additive",
+        "target": {
+            "id": "postgres",
+            "details": {
+                "schema": "auth",
+                "objectType": "table",
+                "name": "email_verification_tokens"
+            }
+        },
+        "precheck": [
+            {
+                "description": "ensure table \"email_verification_tokens\" does not exist",
+                "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+                "params": ["\"auth\".\"email_verification_tokens\""]
+            }
+        ],
+        "execute": [
+            {
+                "description": "create table \"email_verification_tokens\"",
+                "sql": "CREATE TABLE \"auth\".\"email_verification_tokens\" (\n  \"consumedAt\" timestamptz(3),\n  \"createdAt\" timestamptz(3) DEFAULT (now()) NOT NULL,\n  \"expiresAt\" timestamptz(3) NOT NULL,\n  \"id\" text NOT NULL,\n  \"tokenHash\" text NOT NULL,\n  \"userId\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+                "params": []
+            }
+        ],
+        "postcheck": [
+            {
+                "description": "verify table \"email_verification_tokens\" exists",
+                "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+                "params": ["\"auth\".\"email_verification_tokens\""]
+            }
+        ]
+    },
+    {
+        "id": "table.password_reset_tokens",
+        "label": "Create table \"password_reset_tokens\"",
+        "summary": "Creates table \"password_reset_tokens\"",
+        "operationClass": "additive",
+        "target": {
+            "id": "postgres",
+            "details": {
+                "schema": "auth",
+                "objectType": "table",
+                "name": "password_reset_tokens"
+            }
+        },
+        "precheck": [
+            {
+                "description": "ensure table \"password_reset_tokens\" does not exist",
+                "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+                "params": ["\"auth\".\"password_reset_tokens\""]
+            }
+        ],
+        "execute": [
+            {
+                "description": "create table \"password_reset_tokens\"",
+                "sql": "CREATE TABLE \"auth\".\"password_reset_tokens\" (\n  \"consumedAt\" timestamptz(3),\n  \"createdAt\" timestamptz(3) DEFAULT (now()) NOT NULL,\n  \"expiresAt\" timestamptz(3) NOT NULL,\n  \"id\" text NOT NULL,\n  \"tokenHash\" text NOT NULL,\n  \"userId\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+                "params": []
+            }
+        ],
+        "postcheck": [
+            {
+                "description": "verify table \"password_reset_tokens\" exists",
+                "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+                "params": ["\"auth\".\"password_reset_tokens\""]
+            }
+        ]
+    },
+    {
+        "id": "table.refresh_tokens",
+        "label": "Create table \"refresh_tokens\"",
+        "summary": "Creates table \"refresh_tokens\"",
+        "operationClass": "additive",
+        "target": {
+            "id": "postgres",
+            "details": {
+                "schema": "auth",
+                "objectType": "table",
+                "name": "refresh_tokens"
+            }
+        },
+        "precheck": [
+            {
+                "description": "ensure table \"refresh_tokens\" does not exist",
+                "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+                "params": ["\"auth\".\"refresh_tokens\""]
+            }
+        ],
+        "execute": [
+            {
+                "description": "create table \"refresh_tokens\"",
+                "sql": "CREATE TABLE \"auth\".\"refresh_tokens\" (\n  \"consumedAt\" timestamptz(3),\n  \"createdAt\" timestamptz(3) DEFAULT (now()) NOT NULL,\n  \"expiresAt\" timestamptz(3) NOT NULL,\n  \"familyId\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"revokedAt\" timestamptz(3),\n  \"tokenHash\" text NOT NULL,\n  \"userId\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+                "params": []
+            }
+        ],
+        "postcheck": [
+            {
+                "description": "verify table \"refresh_tokens\" exists",
+                "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+                "params": ["\"auth\".\"refresh_tokens\""]
+            }
+        ]
+    },
+    {
+        "id": "table.users",
+        "label": "Create table \"users\"",
+        "summary": "Creates table \"users\"",
+        "operationClass": "additive",
+        "target": {
+            "id": "postgres",
+            "details": {
+                "schema": "auth",
+                "objectType": "table",
+                "name": "users"
+            }
+        },
+        "precheck": [
+            {
+                "description": "ensure table \"users\" does not exist",
+                "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+                "params": ["\"auth\".\"users\""]
+            }
+        ],
+        "execute": [
+            {
+                "description": "create table \"users\"",
+                "sql": "CREATE TABLE \"auth\".\"users\" (\n  \"createdAt\" timestamptz(3) DEFAULT (now()) NOT NULL,\n  \"email\" text NOT NULL,\n  \"emailVerifiedAt\" timestamptz(3),\n  \"id\" text NOT NULL,\n  \"isActive\" bool DEFAULT true NOT NULL,\n  \"passwordHash\" text NOT NULL,\n  \"role\" text DEFAULT 'USER' NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"users_role_check_1954e8c0\" CHECK (\"role\" IN ('USER', 'ADMIN'))\n)",
+                "params": []
+            }
+        ],
+        "postcheck": [
+            {
+                "description": "verify table \"users\" exists",
+                "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+                "params": ["\"auth\".\"users\""]
+            }
+        ]
+    },
+    {
+        "id": "unique.email_verification_tokens.email_verification_tokens_tokenHash_key",
+        "label": "Add unique constraint on \"email_verification_tokens\" (tokenHash)",
+        "operationClass": "additive",
+        "target": {
+            "id": "postgres",
+            "details": {
+                "schema": "auth",
+                "objectType": "unique",
+                "name": "email_verification_tokens_tokenHash_key",
+                "table": "email_verification_tokens"
+            }
+        },
+        "precheck": [
+            {
+                "description": "ensure constraint \"email_verification_tokens_tokenHash_key\" does not exist",
+                "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+                "params": [
+                    "email_verification_tokens_tokenHash_key",
+                    "auth",
+                    "\"auth\".\"email_verification_tokens\""
+                ]
+            }
+        ],
+        "execute": [
+            {
+                "description": "add unique constraint \"email_verification_tokens_tokenHash_key\"",
+                "sql": "ALTER TABLE \"auth\".\"email_verification_tokens\" ADD CONSTRAINT \"email_verification_tokens_tokenHash_key\" UNIQUE (\"tokenHash\")"
+            }
+        ],
+        "postcheck": [
+            {
+                "description": "verify constraint \"email_verification_tokens_tokenHash_key\" exists",
+                "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+                "params": [
+                    "email_verification_tokens_tokenHash_key",
+                    "auth",
+                    "\"auth\".\"email_verification_tokens\""
+                ]
+            }
+        ]
+    },
+    {
+        "id": "unique.password_reset_tokens.password_reset_tokens_tokenHash_key",
+        "label": "Add unique constraint on \"password_reset_tokens\" (tokenHash)",
+        "operationClass": "additive",
+        "target": {
+            "id": "postgres",
+            "details": {
+                "schema": "auth",
+                "objectType": "unique",
+                "name": "password_reset_tokens_tokenHash_key",
+                "table": "password_reset_tokens"
+            }
+        },
+        "precheck": [
+            {
+                "description": "ensure constraint \"password_reset_tokens_tokenHash_key\" does not exist",
+                "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+                "params": [
+                    "password_reset_tokens_tokenHash_key",
+                    "auth",
+                    "\"auth\".\"password_reset_tokens\""
+                ]
+            }
+        ],
+        "execute": [
+            {
+                "description": "add unique constraint \"password_reset_tokens_tokenHash_key\"",
+                "sql": "ALTER TABLE \"auth\".\"password_reset_tokens\" ADD CONSTRAINT \"password_reset_tokens_tokenHash_key\" UNIQUE (\"tokenHash\")"
+            }
+        ],
+        "postcheck": [
+            {
+                "description": "verify constraint \"password_reset_tokens_tokenHash_key\" exists",
+                "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+                "params": [
+                    "password_reset_tokens_tokenHash_key",
+                    "auth",
+                    "\"auth\".\"password_reset_tokens\""
+                ]
+            }
+        ]
+    },
+    {
+        "id": "unique.refresh_tokens.refresh_tokens_tokenHash_key",
+        "label": "Add unique constraint on \"refresh_tokens\" (tokenHash)",
+        "operationClass": "additive",
+        "target": {
+            "id": "postgres",
+            "details": {
+                "schema": "auth",
+                "objectType": "unique",
+                "name": "refresh_tokens_tokenHash_key",
+                "table": "refresh_tokens"
+            }
+        },
+        "precheck": [
+            {
+                "description": "ensure constraint \"refresh_tokens_tokenHash_key\" does not exist",
+                "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+                "params": [
+                    "refresh_tokens_tokenHash_key",
+                    "auth",
+                    "\"auth\".\"refresh_tokens\""
+                ]
+            }
+        ],
+        "execute": [
+            {
+                "description": "add unique constraint \"refresh_tokens_tokenHash_key\"",
+                "sql": "ALTER TABLE \"auth\".\"refresh_tokens\" ADD CONSTRAINT \"refresh_tokens_tokenHash_key\" UNIQUE (\"tokenHash\")"
+            }
+        ],
+        "postcheck": [
+            {
+                "description": "verify constraint \"refresh_tokens_tokenHash_key\" exists",
+                "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+                "params": [
+                    "refresh_tokens_tokenHash_key",
+                    "auth",
+                    "\"auth\".\"refresh_tokens\""
+                ]
+            }
+        ]
+    },
+    {
+        "id": "unique.users.users_email_key",
+        "label": "Add unique constraint on \"users\" (email)",
+        "operationClass": "additive",
+        "target": {
+            "id": "postgres",
+            "details": {
+                "schema": "auth",
+                "objectType": "unique",
+                "name": "users_email_key",
+                "table": "users"
+            }
+        },
+        "precheck": [
+            {
+                "description": "ensure constraint \"users_email_key\" does not exist",
+                "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+                "params": ["users_email_key", "auth", "\"auth\".\"users\""]
+            }
+        ],
+        "execute": [
+            {
+                "description": "add unique constraint \"users_email_key\"",
+                "sql": "ALTER TABLE \"auth\".\"users\" ADD CONSTRAINT \"users_email_key\" UNIQUE (\"email\")"
+            }
+        ],
+        "postcheck": [
+            {
+                "description": "verify constraint \"users_email_key\" exists",
+                "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+                "params": ["users_email_key", "auth", "\"auth\".\"users\""]
+            }
+        ]
+    },
+    {
+        "id": "index.email_verification_tokens.email_verification_tokens_expiresAt_idx_6b6b8c10",
+        "label": "Create index \"email_verification_tokens_expiresAt_idx_6b6b8c10\" on \"email_verification_tokens\"",
+        "operationClass": "additive",
+        "target": {
+            "id": "postgres",
+            "details": {
+                "schema": "auth",
+                "objectType": "index",
+                "name": "email_verification_tokens_expiresAt_idx_6b6b8c10",
+                "table": "email_verification_tokens"
+            }
+        },
+        "precheck": [
+            {
+                "description": "ensure index \"email_verification_tokens_expiresAt_idx_6b6b8c10\" does not exist",
+                "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+                "params": [
+                    "\"auth\".\"email_verification_tokens_expiresAt_idx_6b6b8c10\""
+                ]
+            }
+        ],
+        "execute": [
+            {
+                "description": "create index \"email_verification_tokens_expiresAt_idx_6b6b8c10\"",
+                "sql": "CREATE INDEX \"email_verification_tokens_expiresAt_idx_6b6b8c10\" ON \"auth\".\"email_verification_tokens\" (\"expiresAt\")",
+                "params": []
+            }
+        ],
+        "postcheck": [
+            {
+                "description": "verify index \"email_verification_tokens_expiresAt_idx_6b6b8c10\" exists",
+                "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+                "params": [
+                    "\"auth\".\"email_verification_tokens_expiresAt_idx_6b6b8c10\""
+                ]
+            }
+        ]
+    },
+    {
+        "id": "index.email_verification_tokens.email_verification_tokens_userId_idx_a489d58a",
+        "label": "Create index \"email_verification_tokens_userId_idx_a489d58a\" on \"email_verification_tokens\"",
+        "operationClass": "additive",
+        "target": {
+            "id": "postgres",
+            "details": {
+                "schema": "auth",
+                "objectType": "index",
+                "name": "email_verification_tokens_userId_idx_a489d58a",
+                "table": "email_verification_tokens"
+            }
+        },
+        "precheck": [
+            {
+                "description": "ensure index \"email_verification_tokens_userId_idx_a489d58a\" does not exist",
+                "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+                "params": [
+                    "\"auth\".\"email_verification_tokens_userId_idx_a489d58a\""
+                ]
+            }
+        ],
+        "execute": [
+            {
+                "description": "create index \"email_verification_tokens_userId_idx_a489d58a\"",
+                "sql": "CREATE INDEX \"email_verification_tokens_userId_idx_a489d58a\" ON \"auth\".\"email_verification_tokens\" (\"userId\")",
+                "params": []
+            }
+        ],
+        "postcheck": [
+            {
+                "description": "verify index \"email_verification_tokens_userId_idx_a489d58a\" exists",
+                "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+                "params": [
+                    "\"auth\".\"email_verification_tokens_userId_idx_a489d58a\""
+                ]
+            }
+        ]
+    },
+    {
+        "id": "index.password_reset_tokens.password_reset_tokens_expiresAt_idx_6b6b8c10",
+        "label": "Create index \"password_reset_tokens_expiresAt_idx_6b6b8c10\" on \"password_reset_tokens\"",
+        "operationClass": "additive",
+        "target": {
+            "id": "postgres",
+            "details": {
+                "schema": "auth",
+                "objectType": "index",
+                "name": "password_reset_tokens_expiresAt_idx_6b6b8c10",
+                "table": "password_reset_tokens"
+            }
+        },
+        "precheck": [
+            {
+                "description": "ensure index \"password_reset_tokens_expiresAt_idx_6b6b8c10\" does not exist",
+                "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+                "params": [
+                    "\"auth\".\"password_reset_tokens_expiresAt_idx_6b6b8c10\""
+                ]
+            }
+        ],
+        "execute": [
+            {
+                "description": "create index \"password_reset_tokens_expiresAt_idx_6b6b8c10\"",
+                "sql": "CREATE INDEX \"password_reset_tokens_expiresAt_idx_6b6b8c10\" ON \"auth\".\"password_reset_tokens\" (\"expiresAt\")",
+                "params": []
+            }
+        ],
+        "postcheck": [
+            {
+                "description": "verify index \"password_reset_tokens_expiresAt_idx_6b6b8c10\" exists",
+                "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+                "params": [
+                    "\"auth\".\"password_reset_tokens_expiresAt_idx_6b6b8c10\""
+                ]
+            }
+        ]
+    },
+    {
+        "id": "index.password_reset_tokens.password_reset_tokens_userId_idx_a489d58a",
+        "label": "Create index \"password_reset_tokens_userId_idx_a489d58a\" on \"password_reset_tokens\"",
+        "operationClass": "additive",
+        "target": {
+            "id": "postgres",
+            "details": {
+                "schema": "auth",
+                "objectType": "index",
+                "name": "password_reset_tokens_userId_idx_a489d58a",
+                "table": "password_reset_tokens"
+            }
+        },
+        "precheck": [
+            {
+                "description": "ensure index \"password_reset_tokens_userId_idx_a489d58a\" does not exist",
+                "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+                "params": [
+                    "\"auth\".\"password_reset_tokens_userId_idx_a489d58a\""
+                ]
+            }
+        ],
+        "execute": [
+            {
+                "description": "create index \"password_reset_tokens_userId_idx_a489d58a\"",
+                "sql": "CREATE INDEX \"password_reset_tokens_userId_idx_a489d58a\" ON \"auth\".\"password_reset_tokens\" (\"userId\")",
+                "params": []
+            }
+        ],
+        "postcheck": [
+            {
+                "description": "verify index \"password_reset_tokens_userId_idx_a489d58a\" exists",
+                "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+                "params": [
+                    "\"auth\".\"password_reset_tokens_userId_idx_a489d58a\""
+                ]
+            }
+        ]
+    },
+    {
+        "id": "index.refresh_tokens.refresh_tokens_expiresAt_idx_6b6b8c10",
+        "label": "Create index \"refresh_tokens_expiresAt_idx_6b6b8c10\" on \"refresh_tokens\"",
+        "operationClass": "additive",
+        "target": {
+            "id": "postgres",
+            "details": {
+                "schema": "auth",
+                "objectType": "index",
+                "name": "refresh_tokens_expiresAt_idx_6b6b8c10",
+                "table": "refresh_tokens"
+            }
+        },
+        "precheck": [
+            {
+                "description": "ensure index \"refresh_tokens_expiresAt_idx_6b6b8c10\" does not exist",
+                "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+                "params": ["\"auth\".\"refresh_tokens_expiresAt_idx_6b6b8c10\""]
+            }
+        ],
+        "execute": [
+            {
+                "description": "create index \"refresh_tokens_expiresAt_idx_6b6b8c10\"",
+                "sql": "CREATE INDEX \"refresh_tokens_expiresAt_idx_6b6b8c10\" ON \"auth\".\"refresh_tokens\" (\"expiresAt\")",
+                "params": []
+            }
+        ],
+        "postcheck": [
+            {
+                "description": "verify index \"refresh_tokens_expiresAt_idx_6b6b8c10\" exists",
+                "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+                "params": ["\"auth\".\"refresh_tokens_expiresAt_idx_6b6b8c10\""]
+            }
+        ]
+    },
+    {
+        "id": "index.refresh_tokens.refresh_tokens_familyId_idx_3d03045e",
+        "label": "Create index \"refresh_tokens_familyId_idx_3d03045e\" on \"refresh_tokens\"",
+        "operationClass": "additive",
+        "target": {
+            "id": "postgres",
+            "details": {
+                "schema": "auth",
+                "objectType": "index",
+                "name": "refresh_tokens_familyId_idx_3d03045e",
+                "table": "refresh_tokens"
+            }
+        },
+        "precheck": [
+            {
+                "description": "ensure index \"refresh_tokens_familyId_idx_3d03045e\" does not exist",
+                "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+                "params": ["\"auth\".\"refresh_tokens_familyId_idx_3d03045e\""]
+            }
+        ],
+        "execute": [
+            {
+                "description": "create index \"refresh_tokens_familyId_idx_3d03045e\"",
+                "sql": "CREATE INDEX \"refresh_tokens_familyId_idx_3d03045e\" ON \"auth\".\"refresh_tokens\" (\"familyId\")",
+                "params": []
+            }
+        ],
+        "postcheck": [
+            {
+                "description": "verify index \"refresh_tokens_familyId_idx_3d03045e\" exists",
+                "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+                "params": ["\"auth\".\"refresh_tokens_familyId_idx_3d03045e\""]
+            }
+        ]
+    },
+    {
+        "id": "index.refresh_tokens.refresh_tokens_userId_idx_a489d58a",
+        "label": "Create index \"refresh_tokens_userId_idx_a489d58a\" on \"refresh_tokens\"",
+        "operationClass": "additive",
+        "target": {
+            "id": "postgres",
+            "details": {
+                "schema": "auth",
+                "objectType": "index",
+                "name": "refresh_tokens_userId_idx_a489d58a",
+                "table": "refresh_tokens"
+            }
+        },
+        "precheck": [
+            {
+                "description": "ensure index \"refresh_tokens_userId_idx_a489d58a\" does not exist",
+                "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+                "params": ["\"auth\".\"refresh_tokens_userId_idx_a489d58a\""]
+            }
+        ],
+        "execute": [
+            {
+                "description": "create index \"refresh_tokens_userId_idx_a489d58a\"",
+                "sql": "CREATE INDEX \"refresh_tokens_userId_idx_a489d58a\" ON \"auth\".\"refresh_tokens\" (\"userId\")",
+                "params": []
+            }
+        ],
+        "postcheck": [
+            {
+                "description": "verify index \"refresh_tokens_userId_idx_a489d58a\" exists",
+                "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+                "params": ["\"auth\".\"refresh_tokens_userId_idx_a489d58a\""]
+            }
+        ]
+    },
+    {
+        "id": "foreignKey.email_verification_tokens.email_verification_tokens_userId_fkey",
+        "label": "Add foreign key \"email_verification_tokens_userId_fkey\" on \"email_verification_tokens\"",
+        "operationClass": "additive",
+        "target": {
+            "id": "postgres",
+            "details": {
+                "schema": "auth",
+                "objectType": "foreignKey",
+                "name": "email_verification_tokens_userId_fkey",
+                "table": "email_verification_tokens"
+            }
+        },
+        "precheck": [
+            {
+                "description": "ensure FK \"email_verification_tokens_userId_fkey\" does not exist",
+                "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+                "params": [
+                    "email_verification_tokens_userId_fkey",
+                    "auth",
+                    "\"auth\".\"email_verification_tokens\""
+                ]
+            }
+        ],
+        "execute": [
+            {
+                "description": "add FK \"email_verification_tokens_userId_fkey\"",
+                "sql": "ALTER TABLE \"auth\".\"email_verification_tokens\"\nADD CONSTRAINT \"email_verification_tokens_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"auth\".\"users\" (\"id\")\nON DELETE CASCADE"
+            }
+        ],
+        "postcheck": [
+            {
+                "description": "verify FK \"email_verification_tokens_userId_fkey\" exists",
+                "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+                "params": [
+                    "email_verification_tokens_userId_fkey",
+                    "auth",
+                    "\"auth\".\"email_verification_tokens\""
+                ]
+            }
+        ]
+    },
+    {
+        "id": "foreignKey.password_reset_tokens.password_reset_tokens_userId_fkey",
+        "label": "Add foreign key \"password_reset_tokens_userId_fkey\" on \"password_reset_tokens\"",
+        "operationClass": "additive",
+        "target": {
+            "id": "postgres",
+            "details": {
+                "schema": "auth",
+                "objectType": "foreignKey",
+                "name": "password_reset_tokens_userId_fkey",
+                "table": "password_reset_tokens"
+            }
+        },
+        "precheck": [
+            {
+                "description": "ensure FK \"password_reset_tokens_userId_fkey\" does not exist",
+                "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+                "params": [
+                    "password_reset_tokens_userId_fkey",
+                    "auth",
+                    "\"auth\".\"password_reset_tokens\""
+                ]
+            }
+        ],
+        "execute": [
+            {
+                "description": "add FK \"password_reset_tokens_userId_fkey\"",
+                "sql": "ALTER TABLE \"auth\".\"password_reset_tokens\"\nADD CONSTRAINT \"password_reset_tokens_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"auth\".\"users\" (\"id\")\nON DELETE CASCADE"
+            }
+        ],
+        "postcheck": [
+            {
+                "description": "verify FK \"password_reset_tokens_userId_fkey\" exists",
+                "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+                "params": [
+                    "password_reset_tokens_userId_fkey",
+                    "auth",
+                    "\"auth\".\"password_reset_tokens\""
+                ]
+            }
+        ]
+    },
+    {
+        "id": "foreignKey.refresh_tokens.refresh_tokens_userId_fkey",
+        "label": "Add foreign key \"refresh_tokens_userId_fkey\" on \"refresh_tokens\"",
+        "operationClass": "additive",
+        "target": {
+            "id": "postgres",
+            "details": {
+                "schema": "auth",
+                "objectType": "foreignKey",
+                "name": "refresh_tokens_userId_fkey",
+                "table": "refresh_tokens"
+            }
+        },
+        "precheck": [
+            {
+                "description": "ensure FK \"refresh_tokens_userId_fkey\" does not exist",
+                "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+                "params": [
+                    "refresh_tokens_userId_fkey",
+                    "auth",
+                    "\"auth\".\"refresh_tokens\""
+                ]
+            }
+        ],
+        "execute": [
+            {
+                "description": "add FK \"refresh_tokens_userId_fkey\"",
+                "sql": "ALTER TABLE \"auth\".\"refresh_tokens\"\nADD CONSTRAINT \"refresh_tokens_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"auth\".\"users\" (\"id\")\nON DELETE CASCADE"
+            }
+        ],
+        "postcheck": [
+            {
+                "description": "verify FK \"refresh_tokens_userId_fkey\" exists",
+                "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+                "params": [
+                    "refresh_tokens_userId_fkey",
+                    "auth",
+                    "\"auth\".\"refresh_tokens\""
+                ]
+            }
+        ]
+    }
+]

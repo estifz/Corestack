@@ -1,0 +1,1193 @@
+{
+    "schemaVersion": "1",
+    "targetFamily": "sql",
+    "target": "postgres",
+    "profileHash": "3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2",
+    "roots": {
+        "email_verification_tokens": {
+            "model": "EmailVerificationToken",
+            "namespace": "auth"
+        },
+        "password_reset_tokens": {
+            "model": "PasswordResetToken",
+            "namespace": "auth"
+        },
+        "refresh_tokens": {
+            "model": "RefreshToken",
+            "namespace": "auth"
+        },
+        "sessions": {
+            "model": "Session",
+            "namespace": "auth"
+        },
+        "users": {
+            "model": "User",
+            "namespace": "auth"
+        }
+    },
+    "domain": {
+        "namespaces": {
+            "auth": {
+                "models": {
+                    "EmailVerificationToken": {
+                        "fields": {
+                            "consumedAt": {
+                                "nullable": true,
+                                "type": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "kind": "scalar",
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                }
+                            },
+                            "createdAt": {
+                                "nullable": false,
+                                "type": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "kind": "scalar",
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                }
+                            },
+                            "expiresAt": {
+                                "nullable": false,
+                                "type": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "kind": "scalar",
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                }
+                            },
+                            "id": {
+                                "nullable": false,
+                                "type": {
+                                    "codecId": "pg/text@1",
+                                    "kind": "scalar"
+                                }
+                            },
+                            "tokenHash": {
+                                "nullable": false,
+                                "type": {
+                                    "codecId": "pg/text@1",
+                                    "kind": "scalar"
+                                }
+                            },
+                            "userId": {
+                                "nullable": false,
+                                "type": {
+                                    "codecId": "pg/text@1",
+                                    "kind": "scalar"
+                                }
+                            }
+                        },
+                        "relations": {
+                            "user": {
+                                "cardinality": "N:1",
+                                "nullable": false,
+                                "on": {
+                                    "localFields": ["userId"],
+                                    "targetFields": ["id"]
+                                },
+                                "to": {
+                                    "model": "User",
+                                    "namespace": "auth"
+                                }
+                            }
+                        },
+                        "storage": {
+                            "fields": {
+                                "consumedAt": {
+                                    "column": "consumedAt"
+                                },
+                                "createdAt": {
+                                    "column": "createdAt"
+                                },
+                                "expiresAt": {
+                                    "column": "expiresAt"
+                                },
+                                "id": {
+                                    "column": "id"
+                                },
+                                "tokenHash": {
+                                    "column": "tokenHash"
+                                },
+                                "userId": {
+                                    "column": "userId"
+                                }
+                            },
+                            "namespaceId": "auth",
+                            "table": "email_verification_tokens"
+                        }
+                    },
+                    "PasswordResetToken": {
+                        "fields": {
+                            "consumedAt": {
+                                "nullable": true,
+                                "type": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "kind": "scalar",
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                }
+                            },
+                            "createdAt": {
+                                "nullable": false,
+                                "type": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "kind": "scalar",
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                }
+                            },
+                            "expiresAt": {
+                                "nullable": false,
+                                "type": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "kind": "scalar",
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                }
+                            },
+                            "id": {
+                                "nullable": false,
+                                "type": {
+                                    "codecId": "pg/text@1",
+                                    "kind": "scalar"
+                                }
+                            },
+                            "tokenHash": {
+                                "nullable": false,
+                                "type": {
+                                    "codecId": "pg/text@1",
+                                    "kind": "scalar"
+                                }
+                            },
+                            "userId": {
+                                "nullable": false,
+                                "type": {
+                                    "codecId": "pg/text@1",
+                                    "kind": "scalar"
+                                }
+                            }
+                        },
+                        "relations": {
+                            "user": {
+                                "cardinality": "N:1",
+                                "nullable": false,
+                                "on": {
+                                    "localFields": ["userId"],
+                                    "targetFields": ["id"]
+                                },
+                                "to": {
+                                    "model": "User",
+                                    "namespace": "auth"
+                                }
+                            }
+                        },
+                        "storage": {
+                            "fields": {
+                                "consumedAt": {
+                                    "column": "consumedAt"
+                                },
+                                "createdAt": {
+                                    "column": "createdAt"
+                                },
+                                "expiresAt": {
+                                    "column": "expiresAt"
+                                },
+                                "id": {
+                                    "column": "id"
+                                },
+                                "tokenHash": {
+                                    "column": "tokenHash"
+                                },
+                                "userId": {
+                                    "column": "userId"
+                                }
+                            },
+                            "namespaceId": "auth",
+                            "table": "password_reset_tokens"
+                        }
+                    },
+                    "RefreshToken": {
+                        "fields": {
+                            "consumedAt": {
+                                "nullable": true,
+                                "type": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "kind": "scalar",
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                }
+                            },
+                            "createdAt": {
+                                "nullable": false,
+                                "type": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "kind": "scalar",
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                }
+                            },
+                            "expiresAt": {
+                                "nullable": false,
+                                "type": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "kind": "scalar",
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                }
+                            },
+                            "id": {
+                                "nullable": false,
+                                "type": {
+                                    "codecId": "pg/text@1",
+                                    "kind": "scalar"
+                                }
+                            },
+                            "revokedAt": {
+                                "nullable": true,
+                                "type": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "kind": "scalar",
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                }
+                            },
+                            "sessionId": {
+                                "nullable": false,
+                                "type": {
+                                    "codecId": "pg/text@1",
+                                    "kind": "scalar"
+                                }
+                            },
+                            "tokenHash": {
+                                "nullable": false,
+                                "type": {
+                                    "codecId": "pg/text@1",
+                                    "kind": "scalar"
+                                }
+                            }
+                        },
+                        "relations": {
+                            "session": {
+                                "cardinality": "N:1",
+                                "nullable": false,
+                                "on": {
+                                    "localFields": ["sessionId"],
+                                    "targetFields": ["id"]
+                                },
+                                "to": {
+                                    "model": "Session",
+                                    "namespace": "auth"
+                                }
+                            }
+                        },
+                        "storage": {
+                            "fields": {
+                                "consumedAt": {
+                                    "column": "consumedAt"
+                                },
+                                "createdAt": {
+                                    "column": "createdAt"
+                                },
+                                "expiresAt": {
+                                    "column": "expiresAt"
+                                },
+                                "id": {
+                                    "column": "id"
+                                },
+                                "revokedAt": {
+                                    "column": "revokedAt"
+                                },
+                                "sessionId": {
+                                    "column": "sessionId"
+                                },
+                                "tokenHash": {
+                                    "column": "tokenHash"
+                                }
+                            },
+                            "namespaceId": "auth",
+                            "table": "refresh_tokens"
+                        }
+                    },
+                    "Session": {
+                        "fields": {
+                            "createdAt": {
+                                "nullable": false,
+                                "type": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "kind": "scalar",
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                }
+                            },
+                            "deviceName": {
+                                "nullable": true,
+                                "type": {
+                                    "codecId": "pg/text@1",
+                                    "kind": "scalar"
+                                }
+                            },
+                            "expiresAt": {
+                                "nullable": false,
+                                "type": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "kind": "scalar",
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                }
+                            },
+                            "id": {
+                                "nullable": false,
+                                "type": {
+                                    "codecId": "pg/text@1",
+                                    "kind": "scalar"
+                                }
+                            },
+                            "ipAddress": {
+                                "nullable": true,
+                                "type": {
+                                    "codecId": "pg/text@1",
+                                    "kind": "scalar"
+                                }
+                            },
+                            "lastSeenAt": {
+                                "nullable": true,
+                                "type": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "kind": "scalar",
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                }
+                            },
+                            "revokedAt": {
+                                "nullable": true,
+                                "type": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "kind": "scalar",
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                }
+                            },
+                            "userAgent": {
+                                "nullable": true,
+                                "type": {
+                                    "codecId": "pg/text@1",
+                                    "kind": "scalar"
+                                }
+                            },
+                            "userId": {
+                                "nullable": false,
+                                "type": {
+                                    "codecId": "pg/text@1",
+                                    "kind": "scalar"
+                                }
+                            }
+                        },
+                        "relations": {
+                            "refreshTokens": {
+                                "cardinality": "1:N",
+                                "on": {
+                                    "localFields": ["id"],
+                                    "targetFields": ["sessionId"]
+                                },
+                                "to": {
+                                    "model": "RefreshToken",
+                                    "namespace": "auth"
+                                }
+                            },
+                            "user": {
+                                "cardinality": "N:1",
+                                "nullable": false,
+                                "on": {
+                                    "localFields": ["userId"],
+                                    "targetFields": ["id"]
+                                },
+                                "to": {
+                                    "model": "User",
+                                    "namespace": "auth"
+                                }
+                            }
+                        },
+                        "storage": {
+                            "fields": {
+                                "createdAt": {
+                                    "column": "createdAt"
+                                },
+                                "deviceName": {
+                                    "column": "deviceName"
+                                },
+                                "expiresAt": {
+                                    "column": "expiresAt"
+                                },
+                                "id": {
+                                    "column": "id"
+                                },
+                                "ipAddress": {
+                                    "column": "ipAddress"
+                                },
+                                "lastSeenAt": {
+                                    "column": "lastSeenAt"
+                                },
+                                "revokedAt": {
+                                    "column": "revokedAt"
+                                },
+                                "userAgent": {
+                                    "column": "userAgent"
+                                },
+                                "userId": {
+                                    "column": "userId"
+                                }
+                            },
+                            "namespaceId": "auth",
+                            "table": "sessions"
+                        }
+                    },
+                    "User": {
+                        "fields": {
+                            "createdAt": {
+                                "nullable": false,
+                                "type": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "kind": "scalar",
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                }
+                            },
+                            "email": {
+                                "nullable": false,
+                                "type": {
+                                    "codecId": "pg/text@1",
+                                    "kind": "scalar"
+                                }
+                            },
+                            "emailVerifiedAt": {
+                                "nullable": true,
+                                "type": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "kind": "scalar",
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                }
+                            },
+                            "id": {
+                                "nullable": false,
+                                "type": {
+                                    "codecId": "pg/text@1",
+                                    "kind": "scalar"
+                                }
+                            },
+                            "isActive": {
+                                "nullable": false,
+                                "type": {
+                                    "codecId": "pg/bool@1",
+                                    "kind": "scalar"
+                                }
+                            },
+                            "passwordHash": {
+                                "nullable": false,
+                                "type": {
+                                    "codecId": "pg/text@1",
+                                    "kind": "scalar"
+                                }
+                            },
+                            "role": {
+                                "nullable": false,
+                                "type": {
+                                    "codecId": "pg/text@1",
+                                    "kind": "scalar"
+                                },
+                                "valueSet": {
+                                    "entityKind": "enum",
+                                    "entityName": "UserRole",
+                                    "namespaceId": "public",
+                                    "plane": "domain"
+                                }
+                            },
+                            "updatedAt": {
+                                "nullable": false,
+                                "type": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "kind": "scalar"
+                                }
+                            }
+                        },
+                        "relations": {
+                            "emailVerificationTokens": {
+                                "cardinality": "1:N",
+                                "on": {
+                                    "localFields": ["id"],
+                                    "targetFields": ["userId"]
+                                },
+                                "to": {
+                                    "model": "EmailVerificationToken",
+                                    "namespace": "auth"
+                                }
+                            },
+                            "passwordResetTokens": {
+                                "cardinality": "1:N",
+                                "on": {
+                                    "localFields": ["id"],
+                                    "targetFields": ["userId"]
+                                },
+                                "to": {
+                                    "model": "PasswordResetToken",
+                                    "namespace": "auth"
+                                }
+                            },
+                            "sessions": {
+                                "cardinality": "1:N",
+                                "on": {
+                                    "localFields": ["id"],
+                                    "targetFields": ["userId"]
+                                },
+                                "to": {
+                                    "model": "Session",
+                                    "namespace": "auth"
+                                }
+                            }
+                        },
+                        "storage": {
+                            "fields": {
+                                "createdAt": {
+                                    "column": "createdAt"
+                                },
+                                "email": {
+                                    "column": "email"
+                                },
+                                "emailVerifiedAt": {
+                                    "column": "emailVerifiedAt"
+                                },
+                                "id": {
+                                    "column": "id"
+                                },
+                                "isActive": {
+                                    "column": "isActive"
+                                },
+                                "passwordHash": {
+                                    "column": "passwordHash"
+                                },
+                                "role": {
+                                    "column": "role"
+                                },
+                                "updatedAt": {
+                                    "column": "updatedAt"
+                                }
+                            },
+                            "namespaceId": "auth",
+                            "table": "users"
+                        }
+                    }
+                }
+            },
+            "public": {
+                "enum": {
+                    "UserRole": {
+                        "codecId": "pg/text@1",
+                        "members": [
+                            {
+                                "name": "USER",
+                                "value": "USER"
+                            },
+                            {
+                                "name": "ADMIN",
+                                "value": "ADMIN"
+                            }
+                        ]
+                    }
+                },
+                "models": {}
+            }
+        }
+    },
+    "storage": {
+        "namespaces": {
+            "auth": {
+                "entries": {
+                    "table": {
+                        "email_verification_tokens": {
+                            "columns": {
+                                "consumedAt": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "nativeType": "timestamptz",
+                                    "nullable": true,
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                },
+                                "createdAt": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "default": {
+                                        "expression": "now()",
+                                        "kind": "function"
+                                    },
+                                    "nativeType": "timestamptz",
+                                    "nullable": false,
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                },
+                                "expiresAt": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "nativeType": "timestamptz",
+                                    "nullable": false,
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                },
+                                "id": {
+                                    "codecId": "pg/text@1",
+                                    "nativeType": "text",
+                                    "nullable": false
+                                },
+                                "tokenHash": {
+                                    "codecId": "pg/text@1",
+                                    "nativeType": "text",
+                                    "nullable": false
+                                },
+                                "userId": {
+                                    "codecId": "pg/text@1",
+                                    "nativeType": "text",
+                                    "nullable": false
+                                }
+                            },
+                            "foreignKeys": [
+                                {
+                                    "onDelete": "cascade",
+                                    "source": {
+                                        "columns": ["userId"],
+                                        "namespaceId": "auth",
+                                        "tableName": "email_verification_tokens"
+                                    },
+                                    "target": {
+                                        "columns": ["id"],
+                                        "namespaceId": "auth",
+                                        "tableName": "users"
+                                    }
+                                }
+                            ],
+                            "indexes": [
+                                {
+                                    "columns": ["expiresAt"],
+                                    "name": "email_verification_tokens_expiresAt_idx_6b6b8c10",
+                                    "prefix": "email_verification_tokens_expiresAt_idx",
+                                    "unique": false
+                                },
+                                {
+                                    "columns": ["userId"],
+                                    "name": "email_verification_tokens_userId_idx_a489d58a",
+                                    "prefix": "email_verification_tokens_userId_idx",
+                                    "unique": false
+                                }
+                            ],
+                            "primaryKey": {
+                                "columns": ["id"]
+                            },
+                            "uniques": [
+                                {
+                                    "columns": ["tokenHash"]
+                                }
+                            ]
+                        },
+                        "password_reset_tokens": {
+                            "columns": {
+                                "consumedAt": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "nativeType": "timestamptz",
+                                    "nullable": true,
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                },
+                                "createdAt": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "default": {
+                                        "expression": "now()",
+                                        "kind": "function"
+                                    },
+                                    "nativeType": "timestamptz",
+                                    "nullable": false,
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                },
+                                "expiresAt": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "nativeType": "timestamptz",
+                                    "nullable": false,
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                },
+                                "id": {
+                                    "codecId": "pg/text@1",
+                                    "nativeType": "text",
+                                    "nullable": false
+                                },
+                                "tokenHash": {
+                                    "codecId": "pg/text@1",
+                                    "nativeType": "text",
+                                    "nullable": false
+                                },
+                                "userId": {
+                                    "codecId": "pg/text@1",
+                                    "nativeType": "text",
+                                    "nullable": false
+                                }
+                            },
+                            "foreignKeys": [
+                                {
+                                    "onDelete": "cascade",
+                                    "source": {
+                                        "columns": ["userId"],
+                                        "namespaceId": "auth",
+                                        "tableName": "password_reset_tokens"
+                                    },
+                                    "target": {
+                                        "columns": ["id"],
+                                        "namespaceId": "auth",
+                                        "tableName": "users"
+                                    }
+                                }
+                            ],
+                            "indexes": [
+                                {
+                                    "columns": ["expiresAt"],
+                                    "name": "password_reset_tokens_expiresAt_idx_6b6b8c10",
+                                    "prefix": "password_reset_tokens_expiresAt_idx",
+                                    "unique": false
+                                },
+                                {
+                                    "columns": ["userId"],
+                                    "name": "password_reset_tokens_userId_idx_a489d58a",
+                                    "prefix": "password_reset_tokens_userId_idx",
+                                    "unique": false
+                                }
+                            ],
+                            "primaryKey": {
+                                "columns": ["id"]
+                            },
+                            "uniques": [
+                                {
+                                    "columns": ["tokenHash"]
+                                }
+                            ]
+                        },
+                        "refresh_tokens": {
+                            "columns": {
+                                "consumedAt": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "nativeType": "timestamptz",
+                                    "nullable": true,
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                },
+                                "createdAt": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "default": {
+                                        "expression": "now()",
+                                        "kind": "function"
+                                    },
+                                    "nativeType": "timestamptz",
+                                    "nullable": false,
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                },
+                                "expiresAt": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "nativeType": "timestamptz",
+                                    "nullable": false,
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                },
+                                "id": {
+                                    "codecId": "pg/text@1",
+                                    "nativeType": "text",
+                                    "nullable": false
+                                },
+                                "revokedAt": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "nativeType": "timestamptz",
+                                    "nullable": true,
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                },
+                                "sessionId": {
+                                    "codecId": "pg/text@1",
+                                    "nativeType": "text",
+                                    "nullable": false
+                                },
+                                "tokenHash": {
+                                    "codecId": "pg/text@1",
+                                    "nativeType": "text",
+                                    "nullable": false
+                                }
+                            },
+                            "foreignKeys": [
+                                {
+                                    "onDelete": "cascade",
+                                    "source": {
+                                        "columns": ["sessionId"],
+                                        "namespaceId": "auth",
+                                        "tableName": "refresh_tokens"
+                                    },
+                                    "target": {
+                                        "columns": ["id"],
+                                        "namespaceId": "auth",
+                                        "tableName": "sessions"
+                                    }
+                                }
+                            ],
+                            "indexes": [
+                                {
+                                    "columns": ["expiresAt"],
+                                    "name": "refresh_tokens_expiresAt_idx_6b6b8c10",
+                                    "prefix": "refresh_tokens_expiresAt_idx",
+                                    "unique": false
+                                },
+                                {
+                                    "columns": ["sessionId"],
+                                    "name": "refresh_tokens_sessionId_idx_29f415d4",
+                                    "prefix": "refresh_tokens_sessionId_idx",
+                                    "unique": false
+                                }
+                            ],
+                            "primaryKey": {
+                                "columns": ["id"]
+                            },
+                            "uniques": [
+                                {
+                                    "columns": ["tokenHash"]
+                                }
+                            ]
+                        },
+                        "sessions": {
+                            "columns": {
+                                "createdAt": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "default": {
+                                        "expression": "now()",
+                                        "kind": "function"
+                                    },
+                                    "nativeType": "timestamptz",
+                                    "nullable": false,
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                },
+                                "deviceName": {
+                                    "codecId": "pg/text@1",
+                                    "nativeType": "text",
+                                    "nullable": true
+                                },
+                                "expiresAt": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "nativeType": "timestamptz",
+                                    "nullable": false,
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                },
+                                "id": {
+                                    "codecId": "pg/text@1",
+                                    "nativeType": "text",
+                                    "nullable": false
+                                },
+                                "ipAddress": {
+                                    "codecId": "pg/text@1",
+                                    "nativeType": "text",
+                                    "nullable": true
+                                },
+                                "lastSeenAt": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "nativeType": "timestamptz",
+                                    "nullable": true,
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                },
+                                "revokedAt": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "nativeType": "timestamptz",
+                                    "nullable": true,
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                },
+                                "userAgent": {
+                                    "codecId": "pg/text@1",
+                                    "nativeType": "text",
+                                    "nullable": true
+                                },
+                                "userId": {
+                                    "codecId": "pg/text@1",
+                                    "nativeType": "text",
+                                    "nullable": false
+                                }
+                            },
+                            "foreignKeys": [
+                                {
+                                    "onDelete": "cascade",
+                                    "source": {
+                                        "columns": ["userId"],
+                                        "namespaceId": "auth",
+                                        "tableName": "sessions"
+                                    },
+                                    "target": {
+                                        "columns": ["id"],
+                                        "namespaceId": "auth",
+                                        "tableName": "users"
+                                    }
+                                }
+                            ],
+                            "indexes": [
+                                {
+                                    "columns": ["expiresAt"],
+                                    "name": "sessions_expiresAt_idx_6b6b8c10",
+                                    "prefix": "sessions_expiresAt_idx",
+                                    "unique": false
+                                },
+                                {
+                                    "columns": ["userId"],
+                                    "name": "sessions_userId_idx_a489d58a",
+                                    "prefix": "sessions_userId_idx",
+                                    "unique": false
+                                }
+                            ],
+                            "primaryKey": {
+                                "columns": ["id"]
+                            },
+                            "uniques": []
+                        },
+                        "users": {
+                            "checks": [
+                                {
+                                    "expression": "\"role\" IN ('USER', 'ADMIN')",
+                                    "name": "users_role_check_1954e8c0",
+                                    "prefix": "users_role_check"
+                                }
+                            ],
+                            "columns": {
+                                "createdAt": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "default": {
+                                        "expression": "now()",
+                                        "kind": "function"
+                                    },
+                                    "nativeType": "timestamptz",
+                                    "nullable": false,
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                },
+                                "email": {
+                                    "codecId": "pg/text@1",
+                                    "nativeType": "text",
+                                    "nullable": false
+                                },
+                                "emailVerifiedAt": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "nativeType": "timestamptz",
+                                    "nullable": true,
+                                    "typeParams": {
+                                        "precision": 3
+                                    }
+                                },
+                                "id": {
+                                    "codecId": "pg/text@1",
+                                    "nativeType": "text",
+                                    "nullable": false
+                                },
+                                "isActive": {
+                                    "codecId": "pg/bool@1",
+                                    "default": {
+                                        "kind": "literal",
+                                        "value": true
+                                    },
+                                    "nativeType": "bool",
+                                    "nullable": false
+                                },
+                                "passwordHash": {
+                                    "codecId": "pg/text@1",
+                                    "nativeType": "text",
+                                    "nullable": false
+                                },
+                                "role": {
+                                    "codecId": "pg/text@1",
+                                    "default": {
+                                        "kind": "literal",
+                                        "value": "USER"
+                                    },
+                                    "nativeType": "text",
+                                    "nullable": false,
+                                    "valueSet": {
+                                        "entityKind": "valueSet",
+                                        "entityName": "UserRole",
+                                        "namespaceId": "public",
+                                        "plane": "storage"
+                                    }
+                                },
+                                "updatedAt": {
+                                    "codecId": "pg/timestamptz-temporal@1",
+                                    "nativeType": "timestamptz",
+                                    "nullable": false
+                                }
+                            },
+                            "foreignKeys": [],
+                            "indexes": [],
+                            "primaryKey": {
+                                "columns": ["id"]
+                            },
+                            "uniques": [
+                                {
+                                    "columns": ["email"]
+                                }
+                            ]
+                        }
+                    }
+                },
+                "id": "auth",
+                "kind": "postgres-schema"
+            },
+            "public": {
+                "entries": {
+                    "table": {},
+                    "valueSet": {
+                        "UserRole": {
+                            "kind": "valueSet",
+                            "values": ["USER", "ADMIN"]
+                        }
+                    }
+                },
+                "id": "public",
+                "kind": "postgres-schema"
+            }
+        },
+        "storageHash": "91aaab5834c11dc65f7c651f0daf622fc755b43fce8c4226440f76e9d8319a34"
+    },
+    "execution": {
+        "executionHash": "f70928f044452a1590626e78d72641880e767d7e9c47c605775029b2ffd37d6a",
+        "mutations": {
+            "defaults": [
+                {
+                    "onCreate": {
+                        "id": "uuidv4",
+                        "kind": "generator"
+                    },
+                    "ref": {
+                        "entry": "email_verification_tokens",
+                        "field": "id",
+                        "namespace": "auth"
+                    }
+                },
+                {
+                    "onCreate": {
+                        "id": "uuidv4",
+                        "kind": "generator"
+                    },
+                    "ref": {
+                        "entry": "password_reset_tokens",
+                        "field": "id",
+                        "namespace": "auth"
+                    }
+                },
+                {
+                    "onCreate": {
+                        "id": "uuidv4",
+                        "kind": "generator"
+                    },
+                    "ref": {
+                        "entry": "refresh_tokens",
+                        "field": "id",
+                        "namespace": "auth"
+                    }
+                },
+                {
+                    "onCreate": {
+                        "id": "uuidv4",
+                        "kind": "generator"
+                    },
+                    "ref": {
+                        "entry": "sessions",
+                        "field": "id",
+                        "namespace": "auth"
+                    }
+                },
+                {
+                    "onCreate": {
+                        "id": "uuidv4",
+                        "kind": "generator"
+                    },
+                    "ref": {
+                        "entry": "users",
+                        "field": "id",
+                        "namespace": "auth"
+                    }
+                },
+                {
+                    "onCreate": {
+                        "id": "instantNow",
+                        "kind": "generator"
+                    },
+                    "onUpdate": {
+                        "id": "instantNow",
+                        "kind": "generator"
+                    },
+                    "ref": {
+                        "entry": "users",
+                        "field": "updatedAt",
+                        "namespace": "auth"
+                    }
+                }
+            ]
+        }
+    },
+    "capabilities": {
+        "postgres": {
+            "distinctOn": true,
+            "jsonAgg": true,
+            "lateral": true,
+            "limit": true,
+            "orderBy": true,
+            "returning": true
+        },
+        "sql": {
+            "checkConstraint": true,
+            "defaultInInsert": true,
+            "enums": true,
+            "insertOnConflictSkip": true,
+            "insertOnConflictWithoutTarget": true,
+            "lateral": true,
+            "returning": true,
+            "scalarList": true
+        }
+    },
+    "extensions": {},
+    "meta": {},
+    "_generated": {
+        "warning": "⚠️  GENERATED FILE - DO NOT EDIT",
+        "message": "This file is automatically generated by \"prisma contract emit\".",
+        "regenerate": "To regenerate, run: prisma contract emit"
+    }
+}

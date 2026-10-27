@@ -1,0 +1,98 @@
+// use prisma-8
+enum UserRole {
+  USER
+  ADMIN
+}
+
+namespace auth {
+  model User {
+    id                      String                   @id @default(uuid())
+    email                   String                   @unique
+    passwordHash            String
+    role                    UserRole                 @default(USER)
+    emailVerifiedAt         Timestamptz(3)?
+    isActive                Boolean                  @default(true)
+
+    sessions                Session[]
+    emailVerificationTokens EmailVerificationToken[]
+    passwordResetTokens     PasswordResetToken[]
+
+    createdAt               Timestamptz(3)           @default(now())
+    updatedAt               temporal.updatedAt()
+
+    @@map("users")
+  }
+
+  model Session {
+    id           String         @id @default(uuid())
+    userId       String
+    deviceName   String?
+    ipAddress    String?
+    userAgent    String?
+    lastSeenAt   Timestamptz(3)?
+    expiresAt    Timestamptz(3)
+    revokedAt    Timestamptz(3)?
+
+    user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+    refreshTokens RefreshToken[]
+
+    createdAt    Timestamptz(3) @default(now())
+
+    @@index([userId])
+    @@index([expiresAt])
+
+    @@map("sessions")
+  }
+
+  model RefreshToken {
+    id         String          @id @default(uuid())
+    sessionId  String
+    tokenHash  String          @unique
+    expiresAt  Timestamptz(3)
+    consumedAt Timestamptz(3)?
+    revokedAt  Timestamptz(3)?
+
+    session    Session         @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+    createdAt  Timestamptz(3)  @default(now())
+
+    @@index([sessionId])
+    @@index([expiresAt])
+
+    @@map("refresh_tokens")
+  }
+
+  model EmailVerificationToken {
+    id         String          @id @default(uuid())
+    userId     String
+    tokenHash  String          @unique
+    expiresAt  Timestamptz(3)
+    consumedAt Timestamptz(3)?
+
+    user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    createdAt  Timestamptz(3)  @default(now())
+
+    @@index([userId])
+    @@index([expiresAt])
+
+    @@map("email_verification_tokens")
+  }
+
+  model PasswordResetToken {
+    id         String          @id @default(uuid())
+    userId     String
+    tokenHash  String          @unique
+    expiresAt  Timestamptz(3)
+    consumedAt Timestamptz(3)?
+
+    user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    createdAt  Timestamptz(3)  @default(now())
+
+    @@index([userId])
+    @@index([expiresAt])
+
+    @@map("password_reset_tokens")
+  }
+}
