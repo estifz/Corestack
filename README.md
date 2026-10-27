@@ -63,15 +63,25 @@ Phase 4 introduces pluggable multi-database support to CoreStack, allowing devel
 - **Docker & Web GUI**: Added MongoDB 7.0 container with persistent volumes and **Mongo Express** browser-based administration UI at `http://localhost:8081`.
 - **Adaptive Lifecycle**: Dynamic `/ready` health check and graceful shutdown connection draining for whichever database is active.
 
+### `v0.5.0` — Phase 5: CLI Scaffolding Tool (`create-corestack`)
+
+Phase 5 introduces the dedicated interactive CLI generator (`npx create-corestack` / `pnpm create corestack`) located in `packages/create-corestack`:
+
+- **Next.js-Style Setup**: Offers instant **Recommended Setup** (PostgreSQL + Prisma 8, Complete Auth, Scalar Docs, Docker) or fine-grained **Custom Setup**.
+- **Pluggable Persistence Selection**: Scaffolds dedicated PostgreSQL or MongoDB projects with zero dead code, tailored schemas, and aligned `.env` configurations.
+- **Granular Feature Pruning**: Selectively toggles Authentication & RBAC, Scalar OpenAPI 3.1 documentation, and Docker Compose orchestration.
+- **Multi-Package-Manager Support**: Auto-detects runner or prompts for `pnpm`, `npm`, `yarn`, or `bun`, tailoring CI workflows and run commands.
+- **Automated Lifecycle**: Hands-off `git init` and automatic dependency installation with clean next-step guidance.
+- **100% Tested Pipelines**: Every permutation is verified via comprehensive unit and end-to-end typecheck/test suites.
+
 ### Roadmap & Scope
 
-CoreStack currently covers the complete core foundation: modular feature architecture, security middleware, authentication with session rotation, RBAC, API documentation, pluggable PostgreSQL & MongoDB persistence, Docker orchestration, and automated CI testing.
+CoreStack currently covers the complete core foundation: modular feature architecture, security middleware, authentication with session rotation, RBAC, API documentation, pluggable PostgreSQL & MongoDB persistence, Docker orchestration, automated CI testing, and an interactive CLI scaffolding tool.
 
 Future modules planned for CoreStack:
 
 - **Object Storage**: S3-compatible cloud storage adapter (AWS S3, Cloudflare R2, MinIO).
 - **Background Jobs & Queues**: Asynchronous worker processing (BullMQ / Redis).
-- **CLI Scaffolding Tool**: Interactive project generator (`corestack create`) for custom stack selection.
 
 ---
 
