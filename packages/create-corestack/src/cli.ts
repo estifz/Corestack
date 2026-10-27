@@ -45,7 +45,7 @@ export function parseCliArgs(argv = process.argv): ParsedCliInput {
             '-y, --yes',
             'Use recommended defaults without interactive prompts',
         )
-        .version('0.1.0', '-v, --version', 'Output current version')
+        .version('1.0.0', '-v, --version', 'Output current version')
 
     program.parse(argv)
 

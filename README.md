@@ -63,7 +63,7 @@ Phase 4 introduces pluggable multi-database support to CoreStack, allowing devel
 - **Docker & Web GUI**: Added MongoDB 7.0 container with persistent volumes and **Mongo Express** browser-based administration UI at `http://localhost:8081`.
 - **Adaptive Lifecycle**: Dynamic `/ready` health check and graceful shutdown connection draining for whichever database is active.
 
-### `v0.5.0` — Phase 5: CLI Scaffolding Tool (`create-corestack`)
+### `v1.0.0` — Phase 5: Official 1.0 Milestone & CLI Scaffolding Tool (`create-corestack`)
 
 Phase 5 introduces the dedicated interactive CLI generator (`npx create-corestack` / `pnpm create corestack`) located in `packages/create-corestack`:
 
