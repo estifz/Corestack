@@ -25,8 +25,8 @@ export function printSuccess(config: ProjectConfig): void {
     const runDev = getRunCommand(packageManager, 'dev')
     const runMigration =
         packageManager === 'pnpm' || packageManager === 'bun'
-            ? `${packageManager} migration:apply`
-            : `${packageManager} run migration:apply`
+            ? `${packageManager} migration:deploy`
+            : `${packageManager} run migration:deploy`
 
     const displayPath =
         projectName.startsWith('/') || projectName.startsWith('.')

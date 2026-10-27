@@ -29,8 +29,8 @@ export async function updatePackageJson(
     if (database === 'postgres') {
         depsToRemove.push('mongoose')
     } else {
-        depsToRemove.push('@prisma/orm-postgres')
-        devDepsToRemove.push('prisma', '@prisma/cli-engine')
+        depsToRemove.push('@prisma/client', '@prisma/adapter-pg', 'pg')
+        devDepsToRemove.push('prisma', '@prisma/config', '@types/pg')
     }
 
     if (!auth) {
@@ -55,11 +55,11 @@ export async function updatePackageJson(
 
     // 2. Tailor scripts
     if (database === 'mongodb') {
-        delete pkg.scripts['migration:show']
-        delete pkg.scripts['migration:plan']
-        delete pkg.scripts['migration:apply']
+        delete pkg.scripts['postinstall']
+        delete pkg.scripts['db:generate']
+        delete pkg.scripts['migration:dev']
+        delete pkg.scripts['migration:deploy']
         delete pkg.scripts['migration:status']
-        delete pkg.scripts['contract:emit']
     }
 
     if (!docker) {
@@ -84,9 +84,10 @@ export async function updatePackageJson(
     const workspaceYamlPath = path.join(targetDir, 'pnpm-workspace.yaml')
     if (packageManager === 'pnpm') {
         const allowedBuilds = [
+            ...(database === 'postgres' ? ["    '@prisma/engines': true"] : []),
             ...(auth ? ['    argon2: true'] : []),
             '    esbuild: true',
-            ...(database === 'postgres' ? ['    workerd: true'] : []),
+            ...(database === 'postgres' ? ['    prisma: true'] : []),
         ].join('\n')
 
         await fs.writeFile(

@@ -1,4 +1,5 @@
 import * as p from '@clack/prompts'
+import { execa } from 'execa'
 import pc from 'picocolors'
 import type { ProjectConfig } from '../types.js'
 import { initGit } from '../utils/git.js'
@@ -73,6 +74,26 @@ export async function generateProject(config: ProjectConfig): Promise<void> {
         try {
             await installDependencies(packageManager, targetDir)
             s.stop(`Installed dependencies with ${pc.cyan(packageManager)}`)
+
+            if (database === 'postgres') {
+                s.start('Generating Prisma Client...')
+                try {
+                    await execa(
+                        packageManager,
+                        packageManager === 'npm'
+                            ? ['run', 'db:generate']
+                            : ['db:generate'],
+                        { cwd: targetDir },
+                    )
+                    s.stop('Generated Prisma Client')
+                } catch {
+                    s.stop(
+                        pc.yellow(
+                            `Failed to generate Prisma Client. Run \`${packageManager} run db:generate\` manually.`,
+                        ),
+                    )
+                }
+            }
         } catch {
             s.stop(
                 pc.yellow(

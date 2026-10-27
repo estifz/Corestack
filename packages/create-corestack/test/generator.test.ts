@@ -91,11 +91,15 @@ describe('create-corestack generator', () => {
         // Verify package.json
         const pkg = await fs.readJson(path.join(targetDir, 'package.json'))
         expect(pkg.name).toBe('rec-app')
-        expect(pkg.dependencies['@prisma/orm-postgres']).toBeDefined()
+        expect(pkg.dependencies['@prisma/client']).toBeDefined()
+        expect(pkg.devDependencies['@prisma/config']).toBeDefined()
+        expect(pkg.devDependencies['@types/pg']).toBeDefined()
+        expect(pkg.devDependencies['@types/cors']).toBeDefined()
         expect(pkg.dependencies['mongoose']).toBeUndefined()
         expect(pkg.dependencies['argon2']).toBeDefined()
         expect(pkg.dependencies['@scalar/express-api-reference']).toBeDefined()
-        expect(pkg.scripts['migration:apply']).toBeDefined()
+        expect(pkg.scripts['migration:dev']).toBeDefined()
+        expect(pkg.scripts['migration:deploy']).toBeDefined()
         expect(pkg.scripts['docker:db:postgres']).toBeDefined()
         expect(pkg.scripts['docker:db:mongo']).toBeUndefined()
 
@@ -137,12 +141,7 @@ describe('create-corestack generator', () => {
         expect(await fs.pathExists(path.join(targetDir, 'src/mongo'))).toBe(
             true,
         )
-        expect(await fs.pathExists(path.join(targetDir, 'src/prisma'))).toBe(
-            false,
-        )
-        expect(await fs.pathExists(path.join(targetDir, 'migrations'))).toBe(
-            false,
-        )
+        expect(await fs.pathExists(path.join(targetDir, 'prisma'))).toBe(false)
         expect(
             await fs.pathExists(path.join(targetDir, 'prisma.config.ts')),
         ).toBe(false)
@@ -190,9 +189,12 @@ describe('create-corestack generator', () => {
         const pkg = await fs.readJson(path.join(targetDir, 'package.json'))
         expect(pkg.name).toBe('mongo-app')
         expect(pkg.dependencies['mongoose']).toBeDefined()
-        expect(pkg.dependencies['@prisma/orm-postgres']).toBeUndefined()
+        expect(pkg.dependencies['@prisma/client']).toBeUndefined()
         expect(pkg.devDependencies['prisma']).toBeUndefined()
-        expect(pkg.scripts['migration:apply']).toBeUndefined()
+        expect(pkg.devDependencies['@prisma/config']).toBeUndefined()
+        expect(pkg.devDependencies['@types/pg']).toBeUndefined()
+        expect(pkg.scripts['migration:dev']).toBeUndefined()
+        expect(pkg.scripts['migration:deploy']).toBeUndefined()
         expect(pkg.scripts['docker:db:mongo']).toBeDefined()
         expect(pkg.scripts['docker:db:postgres']).toBeUndefined()
 

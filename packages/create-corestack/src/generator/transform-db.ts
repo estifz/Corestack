@@ -93,11 +93,7 @@ export const health = async (_req: Request, res: Response) => {
 
 export const readiness = async (_req: Request, res: Response) => {
     try {
-        const query = db.raw.sql\`SELECT 1 AS result\`
-            .returnsRow({ result: 'pg/int4@1' })
-            .build()
-
-        await db.runtime().query(query)
+        await db.$queryRaw\`SELECT 1\`
 
         res.status(200).json({
             status: 'ok',
@@ -117,8 +113,8 @@ export const readiness = async (_req: Request, res: Response) => {
     } else {
         // Database is MongoDB
         // Remove Prisma directory, migrations, config, and Prisma repositories
+        await fs.remove(path.join(targetDir, 'prisma'))
         await fs.remove(path.join(targetDir, 'src/prisma'))
-        await fs.remove(path.join(targetDir, 'migrations'))
         await fs.remove(path.join(targetDir, 'prisma.config.ts'))
         await fs.remove(
             path.join(targetDir, 'src/features/auth/prisma-auth.repository.ts'),

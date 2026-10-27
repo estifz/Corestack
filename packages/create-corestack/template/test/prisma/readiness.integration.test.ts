@@ -8,7 +8,7 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)(
     'PostgreSQL readiness integration',
     () => {
         afterAll(async () => {
-            await db.close()
+            await db.$disconnect()
         })
 
         it('executes the readiness query against the configured test database', async () => {

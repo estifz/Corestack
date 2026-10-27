@@ -1,5 +1,5 @@
 import { Temporal } from 'temporal-polyfill/full'
-import { db } from '../../prisma/db.js'
+import { prisma } from '../../prisma/db.js'
 import type { AuthRepository } from './auth.repository.js'
 import type {
     AuthUser,
@@ -12,36 +12,71 @@ import type {
 
 export class PrismaAuthRepository implements AuthRepository {
     async findUserByEmail(email: string): Promise<UserRecord | null> {
-        return db.orm.auth.User.select(
-            'id',
-            'email',
-            'role',
-            'isActive',
-            'passwordHash',
-            'emailVerifiedAt',
-        ).first({
-            email,
+        const user = await prisma.user.findUnique({
+            where: { email },
+            select: {
+                id: true,
+                email: true,
+                role: true,
+                isActive: true,
+                passwordHash: true,
+                emailVerifiedAt: true,
+            },
         })
+        if (!user) return null
+
+        return {
+            id: user.id,
+            email: user.email,
+            role: user.role as 'USER' | 'ADMIN',
+            isActive: user.isActive,
+            passwordHash: user.passwordHash,
+            emailVerifiedAt: user.emailVerifiedAt
+                ? Temporal.Instant.fromEpochMilliseconds(
+                      user.emailVerifiedAt.getTime(),
+                  )
+                : null,
+        }
     }
 
     async findUserById(id: string): Promise<AuthUser | null> {
-        return db.orm.auth.User.select('id', 'email', 'role', 'isActive').first(
-            {
-                id,
+        const user = await prisma.user.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                email: true,
+                role: true,
+                isActive: true,
             },
-        )
+        })
+        if (!user) return null
+
+        return {
+            id: user.id,
+            email: user.email,
+            role: user.role as 'USER' | 'ADMIN',
+            isActive: user.isActive,
+        }
     }
 
     async createUser(input: CreateUserRecord): Promise<AuthUser> {
-        const user = await db.orm.auth.User.create({
-            email: input.email,
-            passwordHash: input.passwordHash,
+        const user = await prisma.user.create({
+            data: {
+                email: input.email,
+                passwordHash: input.passwordHash,
+            },
+            select: {
+                id: true,
+                email: true,
+                role: true,
+                isActive: true,
+            },
         })
 
         return {
             id: user.id,
             email: user.email,
-            role: user.role,
+            role: user.role as 'USER' | 'ADMIN',
             isActive: user.isActive,
         }
     }
@@ -52,18 +87,23 @@ export class PrismaAuthRepository implements AuthRepository {
         expiresAt: Temporal.Instant
         createdAt: Temporal.Instant
     }): Promise<void> {
-        await db.transaction(async (tx) => {
-            await tx.execute(
-                tx.sql.auth.email_verification_tokens
-                    .update({ consumedAt: input.createdAt })
-                    .where((fields, fns) => fns.eq(fields.userId, input.userId))
-                    .where((fields, fns) => fns.eq(fields.consumedAt, null))
-                    .build(),
-            )
-            await tx.orm.auth.EmailVerificationToken.create({
-                userId: input.userId,
-                tokenHash: input.tokenHash,
-                expiresAt: input.expiresAt,
+        await prisma.$transaction(async (tx) => {
+            await tx.emailVerificationToken.updateMany({
+                where: {
+                    userId: input.userId,
+                    consumedAt: null,
+                },
+                data: {
+                    consumedAt: new Date(input.createdAt.epochMilliseconds),
+                },
+            })
+            await tx.emailVerificationToken.create({
+                data: {
+                    userId: input.userId,
+                    tokenHash: input.tokenHash,
+                    expiresAt: new Date(input.expiresAt.epochMilliseconds),
+                    createdAt: new Date(input.createdAt.epochMilliseconds),
+                },
             })
         })
     }
@@ -72,29 +112,31 @@ export class PrismaAuthRepository implements AuthRepository {
         tokenHash: string,
         now: Temporal.Instant,
     ): Promise<boolean> {
-        return db.transaction(async (tx) => {
-            const consumed = await tx.query(
-                tx.sql.auth.email_verification_tokens
-                    .update({ consumedAt: now })
-                    .where((fields, fns) => fns.eq(fields.tokenHash, tokenHash))
-                    .where((fields, fns) => fns.eq(fields.consumedAt, null))
-                    .where((fields, fns) => fns.gt(fields.expiresAt, now))
-                    .returning('userId')
-                    .build(),
-            )
-            if (consumed.length === 0) return false
+        return prisma.$transaction(async (tx) => {
+            const nowDate = new Date(now.epochMilliseconds)
+            const token = await tx.emailVerificationToken.findFirst({
+                where: {
+                    tokenHash,
+                    consumedAt: null,
+                    expiresAt: { gt: nowDate },
+                },
+            })
+            if (!token) return false
 
-            await tx.execute(
-                tx.sql.auth.users
-                    .update({ emailVerifiedAt: now })
-                    .where((fields, fns) =>
-                        fns.eq(fields.id, consumed[0]!.userId),
-                    )
-                    .where((fields, fns) =>
-                        fns.eq(fields.emailVerifiedAt, null),
-                    )
-                    .build(),
-            )
+            await tx.emailVerificationToken.update({
+                where: { id: token.id },
+                data: { consumedAt: nowDate },
+            })
+
+            await tx.user.updateMany({
+                where: {
+                    id: token.userId,
+                    emailVerifiedAt: null,
+                },
+                data: {
+                    emailVerifiedAt: nowDate,
+                },
+            })
             return true
         })
     }
@@ -105,18 +147,23 @@ export class PrismaAuthRepository implements AuthRepository {
         expiresAt: Temporal.Instant
         createdAt: Temporal.Instant
     }): Promise<void> {
-        await db.transaction(async (tx) => {
-            await tx.execute(
-                tx.sql.auth.password_reset_tokens
-                    .update({ consumedAt: input.createdAt })
-                    .where((fields, fns) => fns.eq(fields.userId, input.userId))
-                    .where((fields, fns) => fns.eq(fields.consumedAt, null))
-                    .build(),
-            )
-            await tx.orm.auth.PasswordResetToken.create({
-                userId: input.userId,
-                tokenHash: input.tokenHash,
-                expiresAt: input.expiresAt,
+        await prisma.$transaction(async (tx) => {
+            await tx.passwordResetToken.updateMany({
+                where: {
+                    userId: input.userId,
+                    consumedAt: null,
+                },
+                data: {
+                    consumedAt: new Date(input.createdAt.epochMilliseconds),
+                },
+            })
+            await tx.passwordResetToken.create({
+                data: {
+                    userId: input.userId,
+                    tokenHash: input.tokenHash,
+                    expiresAt: new Date(input.expiresAt.epochMilliseconds),
+                    createdAt: new Date(input.createdAt.epochMilliseconds),
+                },
             })
         })
     }
@@ -126,54 +173,63 @@ export class PrismaAuthRepository implements AuthRepository {
         newPasswordHash: string
         now: Temporal.Instant
     }): Promise<boolean> {
-        return db.transaction(async (tx) => {
-            const consumed = await tx.query(
-                tx.sql.auth.password_reset_tokens
-                    .update({ consumedAt: input.now })
-                    .where((fields, fns) =>
-                        fns.eq(fields.tokenHash, input.tokenHash),
-                    )
-                    .where((fields, fns) => fns.eq(fields.consumedAt, null))
-                    .where((fields, fns) => fns.gt(fields.expiresAt, input.now))
-                    .returning('userId')
-                    .build(),
-            )
-            if (consumed.length === 0) return false
-            const userId = consumed[0]!.userId
+        return prisma.$transaction(async (tx) => {
+            const nowDate = new Date(input.now.epochMilliseconds)
+            const token = await tx.passwordResetToken.findFirst({
+                where: {
+                    tokenHash: input.tokenHash,
+                    consumedAt: null,
+                    expiresAt: { gt: nowDate },
+                },
+            })
+            if (!token) return false
 
-            await tx.execute(
-                tx.sql.auth.users
-                    .update({ passwordHash: input.newPasswordHash })
-                    .where((fields, fns) => fns.eq(fields.id, userId))
-                    .build(),
-            )
+            await tx.passwordResetToken.update({
+                where: { id: token.id },
+                data: { consumedAt: nowDate },
+            })
 
-            await tx.execute(
-                tx.sql.auth.sessions
-                    .update({ revokedAt: input.now })
-                    .where((fields, fns) => fns.eq(fields.userId, userId))
-                    .where((fields, fns) => fns.eq(fields.revokedAt, null))
-                    .build(),
-            )
+            await tx.user.update({
+                where: { id: token.userId },
+                data: { passwordHash: input.newPasswordHash },
+            })
+
+            await tx.session.updateMany({
+                where: {
+                    userId: token.userId,
+                    revokedAt: null,
+                },
+                data: {
+                    revokedAt: nowDate,
+                },
+            })
 
             return true
         })
     }
 
     async createSession(input: CreateSessionInput): Promise<void> {
-        await db.transaction(async (tx) => {
-            const session = await tx.orm.auth.Session.create({
-                userId: input.userId,
-                deviceName: null,
-                ipAddress: input.ipAddress,
-                userAgent: input.userAgent,
-                expiresAt: input.sessionExpiresAt,
+        await prisma.$transaction(async (tx) => {
+            const session = await tx.session.create({
+                data: {
+                    userId: input.userId,
+                    deviceName: null,
+                    ipAddress: input.ipAddress,
+                    userAgent: input.userAgent,
+                    expiresAt: new Date(
+                        input.sessionExpiresAt.epochMilliseconds,
+                    ),
+                },
             })
 
-            await tx.orm.auth.RefreshToken.create({
-                sessionId: session.id,
-                tokenHash: input.refreshTokenHash,
-                expiresAt: input.refreshTokenExpiresAt,
+            await tx.refreshToken.create({
+                data: {
+                    sessionId: session.id,
+                    tokenHash: input.refreshTokenHash,
+                    expiresAt: new Date(
+                        input.refreshTokenExpiresAt.epochMilliseconds,
+                    ),
+                },
             })
         })
     }
@@ -181,12 +237,20 @@ export class PrismaAuthRepository implements AuthRepository {
     async rotateRefreshToken(
         input: RotateRefreshTokenInput,
     ): Promise<RotateRefreshTokenResult> {
-        return db.transaction(async (tx) => {
-            const token = await tx.orm.auth.RefreshToken.include(
-                'session',
-                (session) =>
-                    session.select('id', 'userId', 'expiresAt', 'revokedAt'),
-            ).first({ tokenHash: input.tokenHash })
+        return prisma.$transaction(async (tx) => {
+            const token = await tx.refreshToken.findUnique({
+                where: { tokenHash: input.tokenHash },
+                include: {
+                    session: {
+                        select: {
+                            id: true,
+                            userId: true,
+                            expiresAt: true,
+                            revokedAt: true,
+                        },
+                    },
+                },
+            })
 
             if (
                 !token ||
@@ -197,111 +261,111 @@ export class PrismaAuthRepository implements AuthRepository {
                 return { kind: 'invalid' }
             }
             const session = token.session
+            const nowDate = new Date(input.now.epochMilliseconds)
 
             if (token.consumedAt) {
-                const activeSession = await tx.query(
-                    tx.sql.auth.sessions
-                        .update({ lastSeenAt: input.now })
-                        .where((fields, fns) => fns.eq(fields.id, session.id))
-                        .where((fields, fns) => fns.eq(fields.revokedAt, null))
-                        .where((fields, fns) =>
-                            fns.gt(fields.expiresAt, input.now),
-                        )
-                        .returning('id')
-                        .build(),
-                )
+                const activeSession = await tx.session.findFirst({
+                    where: {
+                        id: session.id,
+                        revokedAt: null,
+                        expiresAt: { gt: nowDate },
+                    },
+                })
 
-                if (activeSession.length === 0) return { kind: 'invalid' }
+                if (!activeSession) return { kind: 'invalid' }
 
-                await tx.execute(
-                    tx.sql.auth.sessions
-                        .update({ revokedAt: input.now })
-                        .where((fields, fns) => fns.eq(fields.id, session.id))
-                        .where((fields, fns) => fns.eq(fields.revokedAt, null))
-                        .build(),
-                )
+                await tx.session.update({
+                    where: { id: session.id },
+                    data: {
+                        lastSeenAt: nowDate,
+                        revokedAt: nowDate,
+                    },
+                })
                 return { kind: 'reused' }
             }
 
-            if (
-                Temporal.Instant.compare(token.expiresAt, input.now) <= 0 ||
-                Temporal.Instant.compare(session.expiresAt, input.now) <= 0
-            ) {
+            if (token.expiresAt <= nowDate || session.expiresAt <= nowDate) {
                 return { kind: 'invalid' }
             }
 
-            // This conditional update locks the session row. Concurrent refreshes
-            // for the same session serialize here, so reuse of the old token is
-            // detected when the second request attempts to consume it.
-            const activeSession = await tx.query(
-                tx.sql.auth.sessions
-                    .update({ lastSeenAt: input.now })
-                    .where((fields, fns) => fns.eq(fields.id, session.id))
-                    .where((fields, fns) => fns.eq(fields.revokedAt, null))
-                    .where((fields, fns) => fns.gt(fields.expiresAt, input.now))
-                    .returning('id')
-                    .build(),
-            )
+            // Lock session row and update lastSeenAt
+            const activeSession = await tx.session.findFirst({
+                where: {
+                    id: session.id,
+                    revokedAt: null,
+                    expiresAt: { gt: nowDate },
+                },
+            })
 
-            if (activeSession.length === 0) return { kind: 'invalid' }
+            if (!activeSession) return { kind: 'invalid' }
 
-            const user = await tx.orm.auth.User.select(
-                'id',
-                'role',
-                'isActive',
-                'emailVerifiedAt',
-            ).first({ id: session.userId })
+            await tx.session.update({
+                where: { id: session.id },
+                data: { lastSeenAt: nowDate },
+            })
+
+            const user = await tx.user.findUnique({
+                where: { id: session.userId },
+                select: {
+                    id: true,
+                    role: true,
+                    isActive: true,
+                    emailVerifiedAt: true,
+                },
+            })
 
             if (!user || !user.isActive || !user.emailVerifiedAt) {
-                await tx.execute(
-                    tx.sql.auth.sessions
-                        .update({ revokedAt: input.now })
-                        .where((fields, fns) => fns.eq(fields.id, session.id))
-                        .where((fields, fns) => fns.eq(fields.revokedAt, null))
-                        .build(),
-                )
+                await tx.session.update({
+                    where: { id: session.id },
+                    data: { revokedAt: nowDate },
+                })
                 return { kind: 'invalid' }
             }
 
-            const consumed = await tx.query(
-                tx.sql.auth.refresh_tokens
-                    .update({ consumedAt: input.now })
-                    .where((fields, fns) => fns.eq(fields.id, token.id))
-                    .where((fields, fns) => fns.eq(fields.consumedAt, null))
-                    .where((fields, fns) => fns.eq(fields.revokedAt, null))
-                    .where((fields, fns) => fns.gt(fields.expiresAt, input.now))
-                    .returning('id')
-                    .build(),
-            )
+            const consumeResult = await tx.refreshToken.updateMany({
+                where: {
+                    id: token.id,
+                    consumedAt: null,
+                    revokedAt: null,
+                    expiresAt: { gt: nowDate },
+                },
+                data: { consumedAt: nowDate },
+            })
 
-            if (consumed.length === 0) {
-                await tx.execute(
-                    tx.sql.auth.sessions
-                        .update({ revokedAt: input.now })
-                        .where((fields, fns) => fns.eq(fields.id, session.id))
-                        .where((fields, fns) => fns.eq(fields.revokedAt, null))
-                        .build(),
-                )
+            if (consumeResult.count === 0) {
+                await tx.session.update({
+                    where: { id: session.id },
+                    data: { revokedAt: nowDate },
+                })
                 return { kind: 'reused' }
             }
 
+            const sessionExpiresInstant =
+                Temporal.Instant.fromEpochMilliseconds(
+                    session.expiresAt.getTime(),
+                )
             const rollingExpiry = input.now.add({
                 seconds: input.refreshTokenTtlSeconds,
             })
             const refreshTokenExpiresAt =
-                Temporal.Instant.compare(rollingExpiry, session.expiresAt) < 0
+                Temporal.Instant.compare(rollingExpiry, sessionExpiresInstant) <
+                0
                     ? rollingExpiry
-                    : session.expiresAt
+                    : sessionExpiresInstant
 
-            await tx.orm.auth.RefreshToken.create({
-                sessionId: session.id,
-                tokenHash: input.nextTokenHash,
-                expiresAt: refreshTokenExpiresAt,
+            await tx.refreshToken.create({
+                data: {
+                    sessionId: session.id,
+                    tokenHash: input.nextTokenHash,
+                    expiresAt: new Date(
+                        refreshTokenExpiresAt.epochMilliseconds,
+                    ),
+                },
             })
 
             return {
                 kind: 'rotated',
-                user: { id: user.id, role: user.role },
+                user: { id: user.id, role: user.role as 'USER' | 'ADMIN' },
                 refreshTokenExpiresAt,
             }
         })
@@ -311,21 +375,22 @@ export class PrismaAuthRepository implements AuthRepository {
         tokenHash: string,
         revokedAt: Temporal.Instant,
     ): Promise<void> {
-        await db.transaction(async (tx) => {
-            const token = await tx.orm.auth.RefreshToken.select(
-                'sessionId',
-            ).first({
-                tokenHash,
+        await prisma.$transaction(async (tx) => {
+            const token = await tx.refreshToken.findUnique({
+                where: { tokenHash },
+                select: { sessionId: true },
             })
             if (!token) return
 
-            await tx.execute(
-                tx.sql.auth.sessions
-                    .update({ revokedAt })
-                    .where((fields, fns) => fns.eq(fields.id, token.sessionId))
-                    .where((fields, fns) => fns.eq(fields.revokedAt, null))
-                    .build(),
-            )
+            await tx.session.updateMany({
+                where: {
+                    id: token.sessionId,
+                    revokedAt: null,
+                },
+                data: {
+                    revokedAt: new Date(revokedAt.epochMilliseconds),
+                },
+            })
         })
     }
 }

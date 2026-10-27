@@ -123,7 +123,7 @@ CoreStack follows a **feature-based architecture** with clear separation between
 ├── .github/
 │   └── workflows/        # GitHub Actions CI pipelines
 ├── docs/                 # In-editor HTTP request collections
-├── migrations/           # Prisma 8 migration files & snapshots
+├── prisma/               # Prisma schema, migrations & configuration
 ├── src/
 │   ├── config/           # Validated environment configuration
 │   ├── core/             # Core logger and graceful shutdown lifecycle
@@ -247,7 +247,7 @@ pnpm docker:db:all
 If using PostgreSQL, apply pending migrations:
 
 ```bash
-pnpm migration:apply
+pnpm migration:deploy
 ```
 
 _(MongoDB requires zero migrations; collections and indexes are initialized automatically)._
@@ -363,38 +363,33 @@ Both providers implement identical contracts for `AuthRepository` and `UserRepos
 
 #### 1. PostgreSQL & Prisma 8
 
-The PostgreSQL path uses Prisma 8's contract workflow with strict typed schema definitions:
+The PostgreSQL path uses stable Prisma 7 with native driver adapters:
 
-- **Contract Definition**: [`src/prisma/contract.prisma`](src/prisma/contract.prisma)
-- **Database Client**: Exported from [`src/prisma/db.ts`](src/prisma/db.ts)
+- **Schema Definition**: [`prisma/schema.prisma`](prisma/schema.prisma)
+- **Configuration**: [`prisma.config.ts`](prisma.config.ts)
+- **Database Client**: Exported from [`src/prisma/db.ts`](src/prisma/db.ts) (configured with `@prisma/adapter-pg` and `pg`)
 
-After editing the contract schema, regenerate the contract artifacts:
+After editing the Prisma schema, regenerate the Prisma Client types:
 
 ```bash
-pnpm contract:emit
+pnpm db:generate
 # or
-pnpm prisma contract emit
+pnpm prisma generate
 ```
-
-This updates:
-
-- `src/prisma/contract.json` — runtime contract metadata
-- `src/prisma/contract.d.ts` — generated TypeScript contract types
 
 Database migration commands:
 
 ```bash
-# Plan a new migration
-pnpm migration:plan -- <migration_name>
+# Create and apply a new migration in development
+pnpm migration:dev
+# or pass a migration name directly:
+pnpm migration:dev --name <migration_name>
 
-# Apply pending migrations to the database
-pnpm migration:apply
+# Apply pending migrations to the database (production / CI)
+pnpm migration:deploy
 
 # Check current migration status
 pnpm migration:status
-
-# Inspect applied migrations
-pnpm migration:show
 ```
 
 #### 2. MongoDB & Mongoose
