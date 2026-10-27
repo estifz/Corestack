@@ -10,12 +10,5 @@ build/
 .vscode/*
 !.vscode/settings.json
 
-# prisma 8 AI Agent Skill Directories
-.agents/
-.claude/
-.cursor/
-.windsurf/
-.devin/
-
 # doc
-md/ 
+md/

@@ -38,7 +38,7 @@ Phase 1 established the reusable backend foundation: project setup, feature-base
 
 ### `v0.2.0` — Phase 2: Data Persistence
 
-Phase 2 added the Prisma 8 contract-based PostgreSQL persistence foundation, including the database contract, generated contract artifacts, database readiness checks, and connection cleanup during shutdown.
+Phase 2 added the Prisma PostgreSQL persistence foundation, including the database schema, SQL migrations, database readiness checks, and connection cleanup during shutdown.
 
 ### `v0.3.0` — Phase 3: Authentication, RBAC, API Documentation & CI
 
@@ -54,11 +54,11 @@ Phase 3 implements an end-to-end, production-grade authentication and user manag
 
 ### `v0.4.0` — Phase 4: Pluggable Multi-Database Architecture (MongoDB & Mongoose)
 
-Phase 4 introduces pluggable multi-database support to CoreStack, allowing developers to choose between **PostgreSQL (Prisma 8)** and **MongoDB (Mongoose)** without affecting business logic:
+Phase 4 introduces pluggable multi-database support to CoreStack, allowing developers to choose between **PostgreSQL (Prisma)** and **MongoDB (Mongoose)** without affecting business logic:
 
 - **Pluggable Architecture**: Runtime database switching via `DATABASE_PROVIDER=postgres | mongodb`.
 - **Decoupled Repositories**: Complete MongoDB repository implementations (`MongoAuthRepository`, `MongoUserRepository`) satisfying the exact same abstract repository contracts.
-- **Mongoose Data Models**: Strict schemas matching the Prisma contract 1:1 (`User`, `Session`, `RefreshToken`, `EmailVerificationToken`, `PasswordResetToken`) with automatic indexing on startup.
+- **Mongoose Data Models**: Strict schemas matching the Prisma schema 1:1 (`User`, `Session`, `RefreshToken`, `EmailVerificationToken`, `PasswordResetToken`) with automatic indexing on startup.
 - **Temporal API Compatibility**: Seamless bi-directional translation between domain `Temporal.Instant` timestamps and MongoDB BSON `Date` storage.
 - **Docker & Web GUI**: Added MongoDB 7.0 container with persistent volumes and **Mongo Express** browser-based administration UI at `http://localhost:8081`.
 - **Adaptive Lifecycle**: Dynamic `/ready` health check and graceful shutdown connection draining for whichever database is active.
@@ -67,7 +67,7 @@ Phase 4 introduces pluggable multi-database support to CoreStack, allowing devel
 
 Phase 5 introduces the dedicated interactive CLI generator (`npx create-corestack` / `pnpm create corestack`) located in `packages/create-corestack`:
 
-- **Next.js-Style Setup**: Offers instant **Recommended Setup** (PostgreSQL + Prisma 8, Complete Auth, Scalar Docs, Docker) or fine-grained **Custom Setup**.
+- **Next.js-Style Setup**: Offers instant **Recommended Setup** (PostgreSQL + Prisma, Complete Auth, Scalar Docs, Docker) or fine-grained **Custom Setup**.
 - **Pluggable Persistence Selection**: Scaffolds dedicated PostgreSQL or MongoDB projects with zero dead code, tailored schemas, and aligned `.env` configurations.
 - **Granular Feature Pruning**: Selectively toggles Authentication & RBAC, Scalar OpenAPI 3.1 documentation, and Docker Compose orchestration.
 - **Multi-Package-Manager Support**: Auto-detects runner or prompts for `pnpm`, `npm`, `yarn`, or `bun`, tailoring CI workflows and run commands.
@@ -87,28 +87,28 @@ Future modules planned for CoreStack:
 
 ## Tech Stack
 
-| Technology                                                      | Purpose                                   |
-| --------------------------------------------------------------- | ----------------------------------------- |
-| [Node.js](https://nodejs.org/)                                  | Runtime                                   |
-| [TypeScript](https://www.typescriptlang.org/)                   | Programming Language                      |
-| [Express](https://expressjs.com/)                               | HTTP Framework                            |
-| [pnpm](https://pnpm.io/)                                        | Package Manager                           |
-| [Prisma ORM](https://www.prisma.io/)                            | Prisma 8 contract-based PostgreSQL access |
-| [PostgreSQL](https://www.postgresql.org/)                       | Relational database                       |
-| [MongoDB](https://www.mongodb.com/)                             | Document-based database                   |
-| [Mongoose](https://mongoosejs.com/)                             | MongoDB Object Data Modeling (ODM)        |
-| [Mongo Express](https://github.com/mongo-express/mongo-express) | Web-based MongoDB administration GUI      |
-| [Argon2](https://github.com/ranisalt/node-argon2)               | Password hashing                          |
-| [jose](https://github.com/panva/jose)                           | JWT signing and verification              |
-| [Resend](https://resend.com/)                                   | Transactional email delivery              |
-| [Scalar](https://scalar.com/)                                   | Interactive OpenAPI documentation UI      |
-| [Zod](https://zod.dev/)                                         | Validation & Configuration                |
-| [Pino](https://getpino.io/)                                     | Structured Logging                        |
-| [Vitest](https://vitest.dev/)                                   | Unit and integration testing              |
-| [Supertest](https://github.com/ladjs/supertest)                 | Express HTTP testing                      |
-| [Docker](https://www.docker.com/)                               | Containerization & service orchestration  |
-| [Husky](https://typicode.github.io/husky/)                      | Git Hooks                                 |
-| [lint-staged](https://github.com/lint-staged/lint-staged)       | Pre-commit Checks                         |
+| Technology                                                      | Purpose                                    |
+| --------------------------------------------------------------- | ------------------------------------------ |
+| [Node.js](https://nodejs.org/)                                  | Runtime                                    |
+| [TypeScript](https://www.typescriptlang.org/)                   | Programming Language                       |
+| [Express](https://expressjs.com/)                               | HTTP Framework                             |
+| [pnpm](https://pnpm.io/)                                        | Package Manager                            |
+| [Prisma ORM](https://www.prisma.io/)                            | PostgreSQL ORM with native driver adapters |
+| [PostgreSQL](https://www.postgresql.org/)                       | Relational database                        |
+| [MongoDB](https://www.mongodb.com/)                             | Document-based database                    |
+| [Mongoose](https://mongoosejs.com/)                             | MongoDB Object Data Modeling (ODM)         |
+| [Mongo Express](https://github.com/mongo-express/mongo-express) | Web-based MongoDB administration GUI       |
+| [Argon2](https://github.com/ranisalt/node-argon2)               | Password hashing                           |
+| [jose](https://github.com/panva/jose)                           | JWT signing and verification               |
+| [Resend](https://resend.com/)                                   | Transactional email delivery               |
+| [Scalar](https://scalar.com/)                                   | Interactive OpenAPI documentation UI       |
+| [Zod](https://zod.dev/)                                         | Validation & Configuration                 |
+| [Pino](https://getpino.io/)                                     | Structured Logging                         |
+| [Vitest](https://vitest.dev/)                                   | Unit and integration testing               |
+| [Supertest](https://github.com/ladjs/supertest)                 | Express HTTP testing                       |
+| [Docker](https://www.docker.com/)                               | Containerization & service orchestration   |
+| [Husky](https://typicode.github.io/husky/)                      | Git Hooks                                  |
+| [lint-staged](https://github.com/lint-staged/lint-staged)       | Pre-commit Checks                          |
 
 ---
 
@@ -361,7 +361,7 @@ DATABASE_PROVIDER=postgres # or 'mongodb'
 
 Both providers implement identical contracts for `AuthRepository` and `UserRepository`. Services and controllers remain completely database-agnostic.
 
-#### 1. PostgreSQL & Prisma 8
+#### 1. PostgreSQL & Prisma 7
 
 The PostgreSQL path uses stable Prisma 7 with native driver adapters:
 
@@ -394,7 +394,7 @@ pnpm migration:status
 
 #### 2. MongoDB & Mongoose
 
-The MongoDB path uses Mongoose with schemas matching the Prisma contract 1:1:
+The MongoDB path uses Mongoose with schemas matching the Prisma schema 1:1:
 
 - **Database Client & Lifecycle**: Exported from [`src/mongo/db.ts`](src/mongo/db.ts)
 - **Mongoose Models**: Located in [`src/mongo/models/`](src/mongo/models/) (`User`, `Session`, `RefreshToken`, `EmailVerificationToken`, `PasswordResetToken`)

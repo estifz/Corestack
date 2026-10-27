@@ -31,8 +31,8 @@ yarn create corestack
 Scaffolds the full production-ready battery in seconds:
 
 - **TypeScript** (Strict mode)
-- **PostgreSQL** with Prisma 8 contract persistence
-- **Complete Authentication & RBAC** (Argon2, JWT session rotation, token reuse detection, Resend email verification, password reset)
+- **PostgreSQL** with stable Prisma 7 persistence
+- **Complete Authentication & RBAC** (JWT)
 - **Interactive Documentation** (Scalar OpenAPI 3.1 at `/docs`)
 - **Docker Compose** orchestration
 - Automatic Git initialization & dependency installation
@@ -41,7 +41,7 @@ Scaffolds the full production-ready battery in seconds:
 
 Customize each layer to match your stack requirements:
 
-- **Database**: PostgreSQL (Prisma 8) or MongoDB (Mongoose)
+- **Database**: PostgreSQL (Prisma 7) or MongoDB (Mongoose)
 - **Auth & RBAC**: Include full auth suite or minimal API skeleton
 - **Interactive API Documentation**: Scalar OpenAPI 3.1 (Yes / No)
 - **Docker Orchestration**: Dockerfile & Compose (Yes / No)

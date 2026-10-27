@@ -125,9 +125,7 @@ export const readiness = async (_req: Request, res: Response) => {
                 'src/features/users/prisma-user.repository.ts',
             ),
         )
-        await fs.remove(
-            path.join(targetDir, 'test/prisma/readiness.integration.test.ts'),
-        )
+        await fs.remove(path.join(targetDir, 'test/prisma'))
 
         // Update auth/index.ts for MongoDB
         const authIndexPath = path.join(targetDir, 'src/features/auth/index.ts')

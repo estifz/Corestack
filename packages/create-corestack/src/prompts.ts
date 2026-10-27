@@ -95,7 +95,7 @@ export async function runPrompts(
             {
                 value: 'recommended',
                 label: 'Recommended',
-                hint: 'PostgreSQL + Prisma 8, Complete Auth, Scalar Docs, Docker',
+                hint: 'PostgreSQL + Prisma, Complete Auth, Scalar Docs, Docker',
             },
             {
                 value: 'customize',
@@ -131,7 +131,7 @@ export async function runPrompts(
     const database = (await p.select({
         message: 'Which database provider do you want to use?',
         options: [
-            { value: 'postgres', label: 'PostgreSQL (Prisma 8)' },
+            { value: 'postgres', label: 'PostgreSQL (Prisma)' },
             { value: 'mongodb', label: 'MongoDB (Mongoose)' },
         ],
         initialValue: 'postgres',
