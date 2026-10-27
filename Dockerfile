@@ -26,7 +26,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Generate database client if prisma is configured
-RUN if [ -f prisma/schema.prisma ]; then pnpm db:generate; fi
+RUN if [ -f prisma/schema.prisma ]; then ./node_modules/.bin/prisma generate --no-hints; fi
 
 # Compile TypeScript to dist/
 RUN pnpm build
