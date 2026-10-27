@@ -16,11 +16,7 @@ export function printBanner(): void {
 `),
         ),
     )
-    console.log(
-        pc.gray(
-            '  Production-oriented TypeScript backend foundation — https://corestack.dev',
-        ),
-    )
+    console.log(pc.gray('  Production-oriented TypeScript backend foundation'))
     console.log()
 }
 
