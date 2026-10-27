@@ -80,12 +80,18 @@ export async function updatePackageJson(
 
     await fs.writeJson(pkgPath, pkg, { spaces: 4 })
 
-    // Configure pnpm allowBuilds for native argon2 if pnpm + auth
+    // Configure pnpm allowBuilds for native & build-hook packages when pnpm is selected
     const workspaceYamlPath = path.join(targetDir, 'pnpm-workspace.yaml')
-    if (packageManager === 'pnpm' && auth) {
+    if (packageManager === 'pnpm') {
+        const allowedBuilds = [
+            ...(auth ? ['    argon2: true'] : []),
+            '    esbuild: true',
+            ...(database === 'postgres' ? ['    workerd: true'] : []),
+        ].join('\n')
+
         await fs.writeFile(
             workspaceYamlPath,
-            'allowBuilds:\n    argon2: true\n',
+            `allowBuilds:\n${allowedBuilds}\n`,
             'utf-8',
         )
     } else {

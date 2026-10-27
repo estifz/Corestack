@@ -418,6 +418,7 @@ describe('create-corestack generator', () => {
             'utf-8',
         )
         expect(pnpmWs).toContain('argon2: true')
+        expect(pnpmWs).toContain('esbuild: true')
 
         const npmDir = path.join(TEST_DIR, 'npm-auth')
         await generateProject({
