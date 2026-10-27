@@ -25,6 +25,9 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Generate database client if prisma is configured
+RUN if [ -f prisma/schema.prisma ]; then pnpm db:generate; fi
+
 # Compile TypeScript to dist/
 RUN pnpm build
 
