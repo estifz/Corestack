@@ -1,3 +1,4 @@
+import type { Temporal } from 'temporal-polyfill/full'
 import type {
     AuthUser,
     CreateSessionInput,

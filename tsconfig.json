@@ -5,7 +5,7 @@
 
         "module": "preserve",
         "target": "esnext",
-        "types": ["node"],
+        "types": ["node", "temporal-polyfill/global"],
 
         "sourceMap": true,
 

@@ -1,3 +1,5 @@
+import type { Temporal } from 'temporal-polyfill/full'
+
 export interface RegisterUserInput {
     email: string
     password: string
