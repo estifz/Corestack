@@ -49,8 +49,8 @@ Phase 3 implements an end-to-end, production-grade authentication and user manag
 - **Password Recovery**: Secure forgot-password flow with one-time tokens and reset-password endpoint that updates credentials and revokes all active sessions.
 - **Role-Based Access Control (RBAC) & Users**: Role middleware (`USER`, `ADMIN`), admin-restricted paginated user listing, admin user lookup, and authenticated user profile endpoint (`/api/v1/auth/me`).
 - **Interactive Documentation**: Interactive API reference powered by Scalar at `/docs`, full OpenAPI 3.1 schema at `/openapi.json`, and an in-editor HTTP request collection (`docs/requests.http`).
-- **Containerization & Docker**: Multi-stage production Dockerfile (Alpine-based, BuildKit caching, lean ~109 MB content size), Docker Compose orchestration for PostgreSQL and App, and automated Docker build verification in GitHub Actions CI.
-- **Testing & CI Pipeline**: Vitest test suite with Supertest route coverage, mock repository DIP testing, and a GitHub Actions CI workflow running containerized PostgreSQL on push and PR.
+- **Containerization & Docker**: Multi-stage production Dockerfile (Alpine-based, BuildKit caching, lean ~109 MB content size) and Docker Compose orchestration for PostgreSQL, MongoDB, and App.
+- **Testing & CI Pipeline**: Vitest test suite with Supertest route coverage, mock repository DIP testing, and a lightweight GitHub Actions CI workflow running tests on push and PR.
 
 ### `v0.4.0` — Phase 4: Pluggable Multi-Database Architecture (MongoDB & Mongoose)
 
@@ -418,7 +418,7 @@ Run the unit and HTTP tests with:
 pnpm test
 ```
 
-For the PostgreSQL readiness integration test, set `TEST_DATABASE_URL` to a dedicated test database URL before running the suite. The integration test only runs a read-only readiness query and closes its Prisma client when finished. Watch tests during development with `pnpm test:watch`.
+The test suite is completely self-contained and runs in-memory using repository mocks and dependency inversion, requiring no running database instances. Watch tests during development with `pnpm test:watch`.
 
 Vitest 5 requires Node.js 22.12 or later; this repository pins Node.js 24.18 in `.tool-versions`.
 
