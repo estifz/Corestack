@@ -1,6 +1,6 @@
-# Stage 1: Base image with pnpm
+# Stage 1: Base image with pnpm and system libraries
 FROM node:24-alpine AS base
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat openssl
 RUN npm install -g pnpm@11.15.1 --force
 WORKDIR /app
 
@@ -35,7 +35,7 @@ RUN pnpm prune --prod --ignore-scripts
 FROM node:24-alpine AS runner
 WORKDIR /app
 
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat openssl
 ENV NODE_ENV=production
 
 # Run with non-root user for security

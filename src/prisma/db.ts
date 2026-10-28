@@ -1,10 +1,27 @@
-import 'temporal-polyfill/full/global'
-import postgres from '@prisma/orm-postgres/runtime'
-import type { Contract } from './contract.d'
-import contractJson from './contract.json' with { type: 'json' }
+import { PrismaPg } from '@prisma/adapter-pg'
+import { PrismaClient } from '@prisma/client'
 import { ENV } from '../config/env.js'
 
-export const db = postgres<Contract>({
-    contractJson,
-    ...(ENV.DATABASE_URL ? { url: ENV.DATABASE_URL } : {}),
+declare global {
+    var __prisma: PrismaClient | undefined
+}
+
+function createPrismaClient(): PrismaClient {
+    const adapter = new PrismaPg({ connectionString: ENV.DATABASE_URL })
+    return new PrismaClient({
+        adapter,
+        log: ENV.NODE_ENV === 'development' ? ['warn', 'error'] : ['error'],
+    })
+}
+
+export const prisma = globalThis.__prisma ?? createPrismaClient()
+
+if (ENV.NODE_ENV !== 'production') {
+    globalThis.__prisma = prisma
+}
+
+export const db = Object.assign(prisma, {
+    close: () => prisma.$disconnect(),
 })
+
+export default prisma

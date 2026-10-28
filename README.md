@@ -54,11 +54,11 @@ Phase 3 implements an end-to-end, production-grade authentication and user manag
 
 ### `v0.4.0` — Phase 4: Pluggable Multi-Database Architecture (MongoDB & Mongoose)
 
-Phase 4 introduces pluggable multi-database support to CoreStack, allowing developers to choose between **PostgreSQL (Prisma 8)** and **MongoDB (Mongoose)** without affecting business logic:
+Phase 4 introduces pluggable multi-database support to CoreStack, allowing developers to choose between **PostgreSQL (Prisma 7)** and **MongoDB (Mongoose)** without affecting business logic:
 
 - **Pluggable Architecture**: Runtime database switching via `DATABASE_PROVIDER=postgres | mongodb`.
 - **Decoupled Repositories**: Complete MongoDB repository implementations (`MongoAuthRepository`, `MongoUserRepository`) satisfying the exact same abstract repository contracts.
-- **Mongoose Data Models**: Strict schemas matching the Prisma contract 1:1 (`User`, `Session`, `RefreshToken`, `EmailVerificationToken`, `PasswordResetToken`) with automatic indexing on startup.
+- **Mongoose Data Models**: Strict schemas matching the Prisma schema 1:1 (`User`, `Session`, `RefreshToken`, `EmailVerificationToken`, `PasswordResetToken`) with automatic indexing on startup.
 - **Temporal API Compatibility**: Seamless bi-directional translation between domain `Temporal.Instant` timestamps and MongoDB BSON `Date` storage.
 - **Docker & Web GUI**: Added MongoDB 7.0 container with persistent volumes and **Mongo Express** browser-based administration UI at `http://localhost:8081`.
 - **Adaptive Lifecycle**: Dynamic `/ready` health check and graceful shutdown connection draining for whichever database is active.
@@ -77,28 +77,28 @@ Future modules planned for CoreStack:
 
 ## Tech Stack
 
-| Technology                                                      | Purpose                                   |
-| --------------------------------------------------------------- | ----------------------------------------- |
-| [Node.js](https://nodejs.org/)                                  | Runtime                                   |
-| [TypeScript](https://www.typescriptlang.org/)                   | Programming Language                      |
-| [Express](https://expressjs.com/)                               | HTTP Framework                            |
-| [pnpm](https://pnpm.io/)                                        | Package Manager                           |
-| [Prisma ORM](https://www.prisma.io/)                            | Prisma 8 contract-based PostgreSQL access |
-| [PostgreSQL](https://www.postgresql.org/)                       | Relational database                       |
-| [MongoDB](https://www.mongodb.com/)                             | Document-based database                   |
-| [Mongoose](https://mongoosejs.com/)                             | MongoDB Object Data Modeling (ODM)        |
-| [Mongo Express](https://github.com/mongo-express/mongo-express) | Web-based MongoDB administration GUI      |
-| [Argon2](https://github.com/ranisalt/node-argon2)               | Password hashing                          |
-| [jose](https://github.com/panva/jose)                           | JWT signing and verification              |
-| [Resend](https://resend.com/)                                   | Transactional email delivery              |
-| [Scalar](https://scalar.com/)                                   | Interactive OpenAPI documentation UI      |
-| [Zod](https://zod.dev/)                                         | Validation & Configuration                |
-| [Pino](https://getpino.io/)                                     | Structured Logging                        |
-| [Vitest](https://vitest.dev/)                                   | Unit and integration testing              |
-| [Supertest](https://github.com/ladjs/supertest)                 | Express HTTP testing                      |
-| [Docker](https://www.docker.com/)                               | Containerization & service orchestration  |
-| [Husky](https://typicode.github.io/husky/)                      | Git Hooks                                 |
-| [lint-staged](https://github.com/lint-staged/lint-staged)       | Pre-commit Checks                         |
+| Technology                                                      | Purpose                                     |
+| --------------------------------------------------------------- | ------------------------------------------- |
+| [Node.js](https://nodejs.org/)                                  | Runtime                                     |
+| [TypeScript](https://www.typescriptlang.org/)                   | Programming Language                        |
+| [Express](https://expressjs.com/)                               | HTTP Framework                              |
+| [pnpm](https://pnpm.io/)                                        | Package Manager                             |
+| [Prisma ORM](https://www.prisma.io/)                            | Prisma 7 PostgreSQL ORM with driver adapter |
+| [PostgreSQL](https://www.postgresql.org/)                       | Relational database                         |
+| [MongoDB](https://www.mongodb.com/)                             | Document-based database                     |
+| [Mongoose](https://mongoosejs.com/)                             | MongoDB Object Data Modeling (ODM)          |
+| [Mongo Express](https://github.com/mongo-express/mongo-express) | Web-based MongoDB administration GUI        |
+| [Argon2](https://github.com/ranisalt/node-argon2)               | Password hashing                            |
+| [jose](https://github.com/panva/jose)                           | JWT signing and verification                |
+| [Resend](https://resend.com/)                                   | Transactional email delivery                |
+| [Scalar](https://scalar.com/)                                   | Interactive OpenAPI documentation UI        |
+| [Zod](https://zod.dev/)                                         | Validation & Configuration                  |
+| [Pino](https://getpino.io/)                                     | Structured Logging                          |
+| [Vitest](https://vitest.dev/)                                   | Unit and integration testing                |
+| [Supertest](https://github.com/ladjs/supertest)                 | Express HTTP testing                        |
+| [Docker](https://www.docker.com/)                               | Containerization & service orchestration    |
+| [Husky](https://typicode.github.io/husky/)                      | Git Hooks                                   |
+| [lint-staged](https://github.com/lint-staged/lint-staged)       | Pre-commit Checks                           |
 
 ---
 
@@ -113,7 +113,7 @@ CoreStack follows a **feature-based architecture** with clear separation between
 ├── .github/
 │   └── workflows/        # GitHub Actions CI pipelines
 ├── docs/                 # In-editor HTTP request collections
-├── migrations/           # Prisma 8 migration files & snapshots
+├── prisma/               # Prisma 7 schema and standard SQL migrations
 ├── src/
 │   ├── config/           # Validated environment configuration
 │   ├── core/             # Core logger and graceful shutdown lifecycle
@@ -125,7 +125,7 @@ CoreStack follows a **feature-based architecture** with clear separation between
 │   ├── infrastructure/   # External integrations (Resend email service)
 │   ├── middlewares/      # Security, auth, CORS origin, and error middlewares
 │   ├── mongo/            # MongoDB connection, lifecycle, and Mongoose models
-│   ├── prisma/           # Database contract, types, and Prisma client
+│   ├── prisma/           # Database client singleton and adapter connection
 │   ├── types/            # TypeScript ambient types and error codes
 │   ├── utils/            # JWT, crypto tokens, and application error classes
 │   ├── app.ts            # Express application setup and routing
@@ -237,7 +237,9 @@ pnpm docker:db:all
 If using PostgreSQL, apply pending migrations:
 
 ```bash
-pnpm migration:apply
+pnpm migration:dev
+# or in production:
+pnpm migration:deploy
 ```
 
 _(MongoDB requires zero migrations; collections and indexes are initialized automatically)._
@@ -351,45 +353,35 @@ DATABASE_PROVIDER=postgres # or 'mongodb'
 
 Both providers implement identical contracts for `AuthRepository` and `UserRepository`. Services and controllers remain completely database-agnostic.
 
-#### 1. PostgreSQL & Prisma 8
+#### 1. PostgreSQL & Prisma 7
 
-The PostgreSQL path uses Prisma 8's contract workflow with strict typed schema definitions:
+The PostgreSQL path uses Prisma 7 with declarative schemas, PostgreSQL driver adapter (`@prisma/adapter-pg`), and standard migrations:
 
-- **Contract Definition**: [`src/prisma/contract.prisma`](src/prisma/contract.prisma)
+- **Schema Definition**: [`prisma/schema.prisma`](prisma/schema.prisma)
 - **Database Client**: Exported from [`src/prisma/db.ts`](src/prisma/db.ts)
 
-After editing the contract schema, regenerate the contract artifacts:
+After editing the Prisma schema, generate the TypeScript client:
 
 ```bash
-pnpm contract:emit
-# or
-pnpm prisma contract emit
+pnpm db:generate
 ```
-
-This updates:
-
-- `src/prisma/contract.json` — runtime contract metadata
-- `src/prisma/contract.d.ts` — generated TypeScript contract types
 
 Database migration commands:
 
 ```bash
-# Plan a new migration
-pnpm migration:plan -- <migration_name>
+# Create and apply a new migration in development
+pnpm migration:dev
 
-# Apply pending migrations to the database
-pnpm migration:apply
+# Apply pending migrations in production or CI
+pnpm migration:deploy
 
 # Check current migration status
 pnpm migration:status
-
-# Inspect applied migrations
-pnpm migration:show
 ```
 
 #### 2. MongoDB & Mongoose
 
-The MongoDB path uses Mongoose with schemas matching the Prisma contract 1:1:
+The MongoDB path uses Mongoose with schemas matching the Prisma schema 1:1:
 
 - **Database Client & Lifecycle**: Exported from [`src/mongo/db.ts`](src/mongo/db.ts)
 - **Mongoose Models**: Located in [`src/mongo/models/`](src/mongo/models/) (`User`, `Session`, `RefreshToken`, `EmailVerificationToken`, `PasswordResetToken`)

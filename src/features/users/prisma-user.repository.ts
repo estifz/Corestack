@@ -1,4 +1,4 @@
-import { db } from '../../prisma/db.js'
+import { prisma } from '../../prisma/db.js'
 import type { UserRepository } from './user.repository.js'
 import type {
     ListUsersQueryInput,
@@ -8,38 +8,50 @@ import type {
 
 export class PrismaUserRepository implements UserRepository {
     async getUser(id: string): Promise<UserProfile | null> {
-        return db.orm.auth.User.select(
-            'id',
-            'email',
-            'role',
-            'isActive',
-            'emailVerifiedAt',
-            'createdAt',
-        ).first({ id })
+        const user = await prisma.user.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                email: true,
+                role: true,
+                isActive: true,
+                emailVerifiedAt: true,
+                createdAt: true,
+            },
+        })
+        if (!user) return null
+
+        return {
+            id: user.id,
+            email: user.email,
+            role: user.role,
+            isActive: user.isActive,
+            emailVerifiedAt: user.emailVerifiedAt,
+            createdAt: user.createdAt,
+        }
     }
 
     async listUsers(params: ListUsersQueryInput): Promise<ListUsersResult> {
-        const [users, aggregateResult] = await Promise.all([
-            db.orm.auth.User.select(
-                'id',
-                'email',
-                'role',
-                'isActive',
-                'emailVerifiedAt',
-                'createdAt',
-            )
-                .orderBy((u) => u.createdAt.desc())
-                .limit(params.limit)
-                .offset(params.offset)
-                .all(),
-            db.orm.auth.User.aggregate((a) => ({
-                total: a.count(),
-            })),
+        const [users, total] = await Promise.all([
+            prisma.user.findMany({
+                select: {
+                    id: true,
+                    email: true,
+                    role: true,
+                    isActive: true,
+                    emailVerifiedAt: true,
+                    createdAt: true,
+                },
+                orderBy: { createdAt: 'desc' },
+                take: params.limit,
+                skip: params.offset,
+            }),
+            prisma.user.count(),
         ])
 
         return {
             users,
-            total: aggregateResult.total,
+            total,
         }
     }
 }
