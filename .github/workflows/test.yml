@@ -28,5 +28,8 @@ jobs:
             - name: Install Dependencies
               run: pnpm install --frozen-lockfile
 
+            - name: Generate Database Client
+              run: pnpm db:generate
+
             - name: Run Vitest Suite
               run: pnpm test
