@@ -1,5 +1,6 @@
 datasource db {
   provider = "postgresql"
+  schemas  = ["auth"]
 }
 
 generator client {
@@ -9,6 +10,8 @@ generator client {
 enum UserRole {
   USER
   ADMIN
+
+  @@schema("auth")
 }
 
 model User {
@@ -27,6 +30,7 @@ model User {
   updatedAt               DateTime                 @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   @@map("users")
+  @@schema("auth")
 }
 
 model Session {
@@ -47,6 +51,7 @@ model Session {
   @@index([userId])
   @@index([expiresAt])
   @@map("sessions")
+  @@schema("auth")
 }
 
 model RefreshToken {
@@ -64,6 +69,7 @@ model RefreshToken {
   @@index([sessionId])
   @@index([expiresAt])
   @@map("refresh_tokens")
+  @@schema("auth")
 }
 
 model EmailVerificationToken {
@@ -80,6 +86,7 @@ model EmailVerificationToken {
   @@index([userId])
   @@index([expiresAt])
   @@map("email_verification_tokens")
+  @@schema("auth")
 }
 
 model PasswordResetToken {
@@ -96,5 +103,6 @@ model PasswordResetToken {
   @@index([userId])
   @@index([expiresAt])
   @@map("password_reset_tokens")
+  @@schema("auth")
 }
 
