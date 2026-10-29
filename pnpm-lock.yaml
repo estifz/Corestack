@@ -213,6 +213,9 @@ importers:
       '@prisma/client':
         specifier: ^7.10.1
         version: 7.10.1(prisma@7.10.1(@types/node@26.1.1)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.0))(react@19.3.0)(typescript@7.0.2))(typescript@7.0.2)
+      '@prisma/config':
+        specifier: ^7.10.1
+        version: 7.10.1(magicast@0.5.5)
       '@scalar/express-api-reference':
         specifier: ^0.10.30
         version: 0.10.30
@@ -228,6 +231,9 @@ importers:
       cors:
         specifier: ^2.8.6
         version: 2.8.6
+      dotenv:
+        specifier: ^17.4.2
+        version: 17.4.2
       express:
         specifier: ^5.2.1
         version: 5.2.1(supports-color@5.5.0)
@@ -252,6 +258,9 @@ importers:
       pino:
         specifier: ^10.3.1
         version: 10.3.1
+      prisma:
+        specifier: ^7.10.1
+        version: 7.10.1(@types/node@26.1.1)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.0))(react@19.3.0)(typescript@7.0.2)
       resend:
         specifier: ^6.34.1
         version: 6.34.1
@@ -262,9 +271,6 @@ importers:
         specifier: ^4.4.3
         version: 4.4.3
     devDependencies:
-      '@prisma/config':
-        specifier: ^7.10.1
-        version: 7.10.1(magicast@0.5.5)
       '@types/compression':
         specifier: ^1.8.1
         version: 1.8.1
@@ -283,9 +289,6 @@ importers:
       '@types/supertest':
         specifier: ^7.2.1
         version: 7.2.1
-      dotenv:
-        specifier: ^17.4.2
-        version: 17.4.2
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -301,9 +304,6 @@ importers:
       prettier:
         specifier: 3.9.6
         version: 3.9.6
-      prisma:
-        specifier: ^7.10.1
-        version: 7.10.1(@types/node@26.1.1)(@types/react@19.3.0)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.0))(react@19.3.0)(typescript@7.0.2)
       supertest:
         specifier: ^7.3.1
         version: 7.3.1(supports-color@5.5.0)

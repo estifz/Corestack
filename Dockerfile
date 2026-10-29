@@ -38,14 +38,21 @@ WORKDIR /app
 RUN apk add --no-cache libc6-compat openssl
 ENV NODE_ENV=production
 
+# Copy entrypoint script and grant execution permissions
+COPY --chown=node:node docker-entrypoint.sh ./docker-entrypoint.sh
+RUN chmod +x ./docker-entrypoint.sh
+
 # Run with non-root user for security
 USER node
 
-# Copy production node_modules, compiled dist, and package metadata
+# Copy production node_modules, compiled dist, prisma assets, and package metadata
 COPY --from=builder --chown=node:node /app/node_modules ./node_modules
 COPY --from=builder --chown=node:node /app/dist ./dist
+COPY --from=builder --chown=node:node /app/prisma ./prisma
+COPY --from=builder --chown=node:node /app/prisma.config.ts ./prisma.config.ts
 COPY --chown=node:node package.json ./
 
 EXPOSE 3000
 
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
 CMD ["node", "dist/server.js"]

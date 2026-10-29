@@ -258,7 +258,7 @@ To build and run the API along with database services in isolated containers:
 docker compose up --build
 ```
 
-The API will be available at `http://localhost:3000` with interactive docs at `http://localhost:3000/docs`.
+The container automatically applies pending database migrations via its entrypoint when using PostgreSQL, and starts the server. The API will be available at `http://localhost:3000` with interactive docs at `http://localhost:3000/docs`.
 
 To stop containers:
 
