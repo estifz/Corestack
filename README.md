@@ -358,6 +358,7 @@ Both providers implement identical contracts for `AuthRepository` and `UserRepos
 The PostgreSQL path uses Prisma 7 with declarative schemas, PostgreSQL driver adapter (`@prisma/adapter-pg`), and standard migrations:
 
 - **Schema Definition**: [`prisma/schema.prisma`](prisma/schema.prisma)
+- **Schema Isolation**: Authentication and session records reside under the dedicated PostgreSQL **`auth`** schema (`auth.users`, `auth.sessions`, `auth.refresh_tokens`, `auth.email_verification_tokens`, `auth.password_reset_tokens`) via Prisma 7 multi-schema support.
 - **Database Client**: Exported from [`src/prisma/db.ts`](src/prisma/db.ts)
 
 After editing the Prisma schema, generate the TypeScript client:
