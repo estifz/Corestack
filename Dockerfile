@@ -16,7 +16,7 @@ RUN pnpm config set fetch-retries 5 && \
 
 # Cache pnpm store across builds
 RUN --mount=type=cache,id=pnpm-store,target=/root/.local/share/pnpm/store \
-    pnpm install --frozen-lockfile --ignore-scripts
+    pnpm install --frozen-lockfile
 
 # Stage 3: Build application and prune devDependencies
 FROM base AS builder
