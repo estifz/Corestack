@@ -2,9 +2,11 @@
 
 process.env.NODE_ENV ??= 'test'
 process.env.PORT ??= '3000'
+process.env.API_BASE_URL ??= 'http://localhost:3000'
 process.env.LOG_LEVEL ??= 'silent'
 process.env.RATE_LIMIT_WINDOW ??= '60000'
 process.env.RATE_LIMIT_REQUEST ??= '1000'
+process.env.DATABASE_PROVIDER ??= 'postgres'
 process.env.DATABASE_URL ??=
     'postgresql://test:test@localhost:5432/corestack_test'
 process.env.JWT_SECRET ??= 'test-secret-that-is-long-enough-for-hmac'

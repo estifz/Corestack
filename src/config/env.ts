@@ -12,12 +12,12 @@ const envSchema = z
         LOG_LEVEL: z.string(),
         RATE_LIMIT_WINDOW: z.coerce.number(),
         RATE_LIMIT_REQUEST: z.coerce.number(),
-        DATABASE_PROVIDER: z.enum(['postgres', 'mongodb']).default('postgres'),
+        DATABASE_PROVIDER: z.enum(['postgres', 'mongodb']),
         DATABASE_URL: z.string().optional(),
         MONGODB_URI: z.string().optional(),
         RESEND_API_KEY: z.string().optional(),
         RESEND_FROM_EMAIL: z.string().min(1).default('onboarding@resend.dev'),
-        API_BASE_URL: z.string().url().default('http://localhost:3000'),
+        API_BASE_URL: z.string().url(),
         EMAIL_VERIFICATION_TTL_SECONDS: z.coerce
             .number()
             .int()
@@ -50,7 +50,7 @@ const envSchema = z
             .transform((value) => value === 'true'),
         CORS_ORIGINS: z
             .string()
-            .default('http://localhost:3000')
+            .min(1, 'CORS_ORIGINS is required')
             .transform((value) =>
                 value
                     .split(',')
