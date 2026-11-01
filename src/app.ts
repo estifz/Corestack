@@ -25,7 +25,7 @@ app.use(compression())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(
-    morgan('dev', {
+    morgan(ENV.NODE_ENV === 'production' ? 'combined' : 'dev', {
         skip: (req) =>
             req.method === 'GET' && req.path === '/api/v1/auth/verify-email',
     }),
