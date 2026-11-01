@@ -21,10 +21,12 @@ RATE_LIMIT_REQUEST=100
 # Database
 DATABASE_PROVIDER=${config.databaseProvider}
 `
+    const dbPort = config.dbPort ?? (isPostgres ? 5432 : 27017)
+
     if (isPostgres) {
-        envContent += `DATABASE_URL="postgresql://postgres:password@localhost:5432/${config.projectName}"\n`
+        envContent += `DATABASE_URL="postgresql://postgres:password@localhost:${dbPort}/${config.projectName}"\n`
     } else {
-        envContent += `MONGODB_URI="mongodb://localhost:27017/${config.projectName}"\n`
+        envContent += `MONGODB_URI="mongodb://localhost:${dbPort}/${config.projectName}"\n`
     }
 
     if (config.includeAuth) {

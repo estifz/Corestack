@@ -22,6 +22,8 @@ export function transformDocker(config: ProjectConfig): void {
     if (fs.existsSync(composeFile)) {
         let composeContent = ''
 
+        const dbPort = config.dbPort ?? (isPostgres ? 5432 : 27017)
+
         if (isPostgres) {
             composeContent = `name: ${config.projectName}
 
@@ -34,7 +36,7 @@ services:
             POSTGRES_PASSWORD: \${POSTGRES_PASSWORD:-password}
             POSTGRES_DB: \${POSTGRES_DB:-${config.projectName}}
         ports:
-            - '5432:5432'
+            - '${dbPort}:5432'
         volumes:
             - postgres_data:/var/lib/postgresql/data
         healthcheck:
@@ -96,7 +98,7 @@ services:
         image: mongo:7.0
         restart: unless-stopped
         ports:
-            - '27017:27017'
+            - '${dbPort}:27017'
         volumes:
             - mongodb_data:/data/db
         healthcheck:

@@ -3,6 +3,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { applyTransforms } from './transforms/index.js'
 import type { ProjectConfig } from './types.js'
+import { findAvailablePort } from './utils/ports.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -75,6 +76,13 @@ export async function scaffoldProject(config: ProjectConfig): Promise<void> {
         fs.writeFileSync(huskyPreCommit, 'npx lint-staged\n', { mode: 0o755 })
     }
 
-    // 5. Apply modular transformations based on selections
+    // 5. Automatically resolve available port for the database
+    if (config.dbPort === undefined) {
+        const preferredPort =
+            config.databaseProvider === 'postgres' ? 5432 : 27017
+        config.dbPort = await findAvailablePort(preferredPort)
+    }
+
+    // 6. Apply modular transformations based on selections
     applyTransforms(config)
 }

@@ -34,12 +34,9 @@ const program = new Command()
             try {
                 let config: ProjectConfig
 
-                const hasExplicitFlags =
-                    flags?.recommended ||
-                    flags?.database !== undefined ||
-                    flags?.auth !== undefined ||
-                    flags?.docs !== undefined ||
-                    flags?.docker !== undefined
+                const hasExplicitFlags = process.argv
+                    .slice(2)
+                    .some((arg) => arg.startsWith('-'))
 
                 if (hasExplicitFlags) {
                     const rawDir = targetDir?.trim() || 'my-app'
