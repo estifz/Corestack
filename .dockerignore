@@ -13,11 +13,6 @@ build
 .gitignore
 .husky
 .vscode
-.agents
-.claude
-.cursor
-.windsurf
-.devin
 
 # Documentation and temporary files
 md

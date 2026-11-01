@@ -14,6 +14,14 @@ import { NotFoundError } from './utils/errors/appError.js'
 
 const app = express()
 
+morgan.token('url', (req) => {
+    const rawUrl = (req as express.Request).originalUrl || req.url || ''
+    return rawUrl.replace(
+        /([?&](?:token|code|secret|key|password)=)[^&]+/gi,
+        '$1[REDACTED]',
+    )
+})
+
 app.use(
     cors({
         origin: ENV.CORS_ORIGINS,
@@ -24,12 +32,7 @@ app.use(helmet())
 app.use(compression())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-app.use(
-    morgan(ENV.NODE_ENV === 'production' ? 'combined' : 'dev', {
-        skip: (req) =>
-            req.method === 'GET' && req.path === '/api/v1/auth/verify-email',
-    }),
-)
+app.use(morgan(ENV.NODE_ENV === 'production' ? 'combined' : 'dev'))
 app.use(limiter)
 
 app.use(healthRoutes)

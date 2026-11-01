@@ -23,13 +23,6 @@ function getSecretKey(): Uint8Array {
     return new TextEncoder().encode(ENV.JWT_SECRET)
 }
 
-/**
- * Signs a JWT access token for a user.
- * - Sets the subject (`sub`) to the user ID.
- * - Adds the user's `role` as a custom claim.
- * - Sets the issued-at (`iat`) timestamp.
- * - Sets the expiration time (`exp`) according to `JWT_EXPIRES_IN`.
- */
 export async function signAccessToken(
     input: SignAccessTokenInput,
 ): Promise<string> {
@@ -43,13 +36,6 @@ export async function signAccessToken(
         .sign(secret)
 }
 
-/**
- * Verifies and decodes an access token.
- * - Validates the signature using `JWT_SECRET`.
- * - Validates token expiration.
- * - Ensures required `sub` and `role` claims are present and valid.
- * - Rejects invalid or expired tokens with an `UnauthorizedError`.
- */
 export async function verifyAccessToken(
     token: string,
 ): Promise<VerifiedAccessTokenPayload> {
