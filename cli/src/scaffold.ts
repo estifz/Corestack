@@ -1,19 +1,18 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { applyTransforms } from './transforms/index.js'
 import type { ProjectConfig } from './types.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 export function getTemplateDir(): string {
-    // Check relative to dist/
     const distPath = path.resolve(__dirname, '../template')
     if (fs.existsSync(distPath)) {
         return distPath
     }
 
-    // Check relative to src/ (development mode)
     const srcPath = path.resolve(__dirname, '../../template')
     if (fs.existsSync(srcPath)) {
         return srcPath
@@ -54,9 +53,7 @@ export function prepareTargetDirectory(targetPath: string): void {
     }
 }
 
-export async function scaffoldBaseProject(
-    config: ProjectConfig,
-): Promise<void> {
+export async function scaffoldProject(config: ProjectConfig): Promise<void> {
     const templateDir = getTemplateDir()
 
     // 1. Ensure target directory is clean and ready
@@ -77,4 +74,7 @@ export async function scaffoldBaseProject(
     if (fs.existsSync(huskyPreCommit)) {
         fs.writeFileSync(huskyPreCommit, 'npx lint-staged\n', { mode: 0o755 })
     }
+
+    // 5. Apply modular transformations based on selections
+    applyTransforms(config)
 }

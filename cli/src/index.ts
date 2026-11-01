@@ -3,7 +3,7 @@ import { outro, spinner } from '@clack/prompts'
 import { Command } from 'commander'
 import pc from 'picocolors'
 import { runPrompts } from './prompts.js'
-import { scaffoldBaseProject } from './scaffold.js'
+import { scaffoldProject } from './scaffold.js'
 import type { CliFlags, ProjectConfig } from './types.js'
 import { detectPackageManager } from './utils/pm.js'
 
@@ -23,17 +23,24 @@ const program = new Command()
         try {
             let config: ProjectConfig
 
-            if (flags?.recommended) {
+            const hasExplicitFlags =
+                flags?.recommended ||
+                flags?.database !== undefined ||
+                flags?.auth !== undefined ||
+                flags?.docs !== undefined ||
+                flags?.docker !== undefined
+
+            if (hasExplicitFlags) {
                 const rawDir = targetDir?.trim() || 'my-app'
                 const projectPath = path.resolve(process.cwd(), rawDir)
                 const projectName = path.basename(projectPath)
                 config = {
                     projectName,
                     projectPath,
-                    databaseProvider: 'postgres',
-                    includeAuth: true,
-                    includeDocs: true,
-                    includeDocker: true,
+                    databaseProvider: flags?.database ?? 'postgres',
+                    includeAuth: flags?.auth ?? true,
+                    includeDocs: flags?.docs ?? true,
+                    includeDocker: flags?.docker ?? true,
                     packageManager: detectPackageManager(),
                 }
             } else {
@@ -66,15 +73,13 @@ const program = new Command()
             console.log('')
 
             const s = spinner()
-            s.start('Scaffolding base project files...')
+            s.start('Scaffolding project...')
 
-            await scaffoldBaseProject(config)
+            await scaffoldProject(config)
 
-            s.stop('Base project files scaffolded successfully.')
+            s.stop('Project files scaffolded and configured.')
 
-            outro(
-                pc.green(`Base scaffolding complete in ${config.projectPath}`),
-            )
+            outro(pc.green(`Project created in ${config.projectPath}`))
         } catch (error) {
             console.error(
                 pc.red('Error:'),
