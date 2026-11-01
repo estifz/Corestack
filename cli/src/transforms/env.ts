@@ -24,7 +24,10 @@ DATABASE_PROVIDER=${config.databaseProvider}
     const dbPort = config.dbPort ?? (isPostgres ? 5432 : 27017)
 
     if (isPostgres) {
-        envContent += `DATABASE_URL="postgresql://postgres:password@localhost:${dbPort}/${config.projectName}"\n`
+        envContent += `POSTGRES_USER=postgres
+POSTGRES_PASSWORD=password
+POSTGRES_DB=${config.projectName}
+DATABASE_URL="postgresql://postgres:password@localhost:${dbPort}/${config.projectName}"\n`
     } else {
         envContent += `MONGODB_URI="mongodb://localhost:${dbPort}/${config.projectName}"\n`
     }
