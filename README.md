@@ -54,7 +54,7 @@ Phase 3 implements an end-to-end, production-grade authentication and user manag
 
 ### `v0.4.0` — Phase 4: Pluggable Multi-Database Architecture (MongoDB & Mongoose)
 
-Phase 4 introduces pluggable multi-database support to CoreStack, allowing developers to choose between **PostgreSQL (Prisma 7)** and **MongoDB (Mongoose)** without affecting business logic:
+Phase 4 introduces pluggable multi-database support to CoreStack, allowing developers to choose between **PostgreSQL (Prisma 8)** and **MongoDB (Mongoose)** without affecting business logic:
 
 - **Pluggable Architecture**: Runtime database switching via `DATABASE_PROVIDER=postgres | mongodb`.
 - **Decoupled Repositories**: Complete MongoDB repository implementations (`MongoAuthRepository`, `MongoUserRepository`) satisfying the exact same abstract repository contracts.
@@ -62,6 +62,12 @@ Phase 4 introduces pluggable multi-database support to CoreStack, allowing devel
 - **Temporal API Compatibility**: Seamless bi-directional translation between domain `Temporal.Instant` timestamps and MongoDB BSON `Date` storage.
 - **Docker & Web GUI**: Added MongoDB 7.0 container with persistent volumes and **Mongo Express** browser-based administration UI at `http://localhost:8081`.
 - **Adaptive Lifecycle**: Dynamic `/ready` health check and graceful shutdown connection draining for whichever database is active.
+
+### `v0.5.0` — Phase 5: Prisma 7 Migration
+
+Phase 5 transitions the PostgreSQL persistence foundation from experimental Prisma 8 RC contracts to stable Prisma 7, implements automated container startup migrations, hardens environment configuration, and upgrades production auditing:
+
+- **Prisma 7 Migration**: Fully migrated from experimental Prisma 8 contracts (`@prisma/orm-postgres`, `prisma contract emit`, `prisma db migrate`) to stable, battle-tested **Prisma 7** (`@prisma/client` 7.10.x, `@prisma/adapter-pg`, and `@prisma/config`).
 
 ### Roadmap & Scope
 
@@ -407,6 +413,12 @@ Run the unit and HTTP tests with:
 
 ```bash
 pnpm test
+```
+
+Run TypeScript typechecking with:
+
+```bash
+pnpm typecheck
 ```
 
 The test suite is completely self-contained and runs in-memory using repository mocks and dependency inversion, requiring no running database instances. Watch tests during development with `pnpm test:watch`.
