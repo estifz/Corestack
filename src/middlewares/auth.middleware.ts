@@ -22,12 +22,33 @@ export const authenticate: RequestHandler = async (req, _res, next) => {
         req.user = {
             id: payload.sub,
             role: payload.role,
+            isEmailVerified: Boolean(payload.isEmailVerified),
         }
 
         next()
     } catch (error) {
         next(error)
     }
+}
+
+/**
+ * Express middleware to ensure the authenticated user has a verified email address.
+ * Use on sensitive routes that require verified identity.
+ */
+export const requireVerifiedEmail: RequestHandler = (req, _res, next) => {
+    if (!req.user) {
+        return next(new UnauthorizedError('Authentication is required'))
+    }
+
+    if (!req.user.isEmailVerified) {
+        return next(
+            new ForbiddenError(
+                'Email verification is required to perform this action',
+            ),
+        )
+    }
+
+    next()
 }
 
 /**

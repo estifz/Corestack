@@ -44,6 +44,7 @@ describe('Password Reset', () => {
                 passwordHash: 'hashed-pwd',
                 role: 'USER',
                 isActive: true,
+                isEmailVerified: false,
                 emailVerifiedAt: null,
             })
 

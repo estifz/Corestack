@@ -18,6 +18,7 @@ export interface AuthUser {
     email: string
     role: 'USER' | 'ADMIN'
     isActive: boolean
+    isEmailVerified: boolean
 }
 
 export interface UserRecord extends AuthUser {
@@ -54,7 +55,7 @@ export interface RotateRefreshTokenInput {
 export type RotateRefreshTokenResult =
     | {
           kind: 'rotated'
-          user: Pick<AuthUser, 'id' | 'role'>
+          user: Pick<AuthUser, 'id' | 'role' | 'isEmailVerified'>
           refreshTokenExpiresAt: Temporal.Instant
       }
     | { kind: 'invalid' | 'reused' }

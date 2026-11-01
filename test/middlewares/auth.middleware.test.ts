@@ -1,9 +1,11 @@
+/// <reference path="../../src/types/express.d.ts" />
 import express from 'express'
 import request from 'supertest'
 import { describe, expect, it } from 'vitest'
 import {
     authenticate,
     authorize,
+    requireVerifiedEmail,
 } from '../../src/middlewares/auth.middleware.js'
 import { errorHandler } from '../../src/middlewares/errorHandler.js'
 import { signAccessToken } from '../../src/utils/jwt.js'
@@ -13,6 +15,14 @@ function createApp() {
     app.get('/protected', authenticate, authorize('ADMIN'), (req, res) => {
         res.json({ user: req.user })
     })
+    app.get(
+        '/verified-only',
+        authenticate,
+        requireVerifiedEmail,
+        (_req, res) => {
+            res.json({ status: 'ok' })
+        },
+    )
     app.use(errorHandler)
     return app
 }
@@ -42,13 +52,42 @@ describe('authentication and role middleware', () => {
         const token = await signAccessToken({
             userId: 'admin-1',
             role: 'ADMIN',
+            isEmailVerified: true,
         })
         const response = await request(createApp())
             .get('/protected')
             .set('Authorization', `Bearer ${token}`)
         expect(response.status).toBe(200)
         expect(response.body).toEqual({
-            user: { id: 'admin-1', role: 'ADMIN' },
+            user: { id: 'admin-1', role: 'ADMIN', isEmailVerified: true },
         })
+    })
+
+    it('blocks unverified users with requireVerifiedEmail', async () => {
+        const token = await signAccessToken({
+            userId: 'user-1',
+            role: 'USER',
+            isEmailVerified: false,
+        })
+        const response = await request(createApp())
+            .get('/verified-only')
+            .set('Authorization', `Bearer ${token}`)
+        expect(response.status).toBe(403)
+        expect(response.body.message).toContain(
+            'Email verification is required',
+        )
+    })
+
+    it('allows verified users with requireVerifiedEmail', async () => {
+        const token = await signAccessToken({
+            userId: 'user-1',
+            role: 'USER',
+            isEmailVerified: true,
+        })
+        const response = await request(createApp())
+            .get('/verified-only')
+            .set('Authorization', `Bearer ${token}`)
+        expect(response.status).toBe(200)
+        expect(response.body).toEqual({ status: 'ok' })
     })
 })

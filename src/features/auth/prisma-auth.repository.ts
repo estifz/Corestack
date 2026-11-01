@@ -30,6 +30,7 @@ export class PrismaAuthRepository implements AuthRepository {
             email: user.email,
             role: user.role as 'USER' | 'ADMIN',
             isActive: user.isActive,
+            isEmailVerified: Boolean(user.emailVerifiedAt),
             passwordHash: user.passwordHash,
             emailVerifiedAt: user.emailVerifiedAt
                 ? Temporal.Instant.fromEpochMilliseconds(
@@ -47,6 +48,7 @@ export class PrismaAuthRepository implements AuthRepository {
                 email: true,
                 role: true,
                 isActive: true,
+                emailVerifiedAt: true,
             },
         })
         if (!user) return null
@@ -56,6 +58,7 @@ export class PrismaAuthRepository implements AuthRepository {
             email: user.email,
             role: user.role as 'USER' | 'ADMIN',
             isActive: user.isActive,
+            isEmailVerified: Boolean(user.emailVerifiedAt),
         }
     }
 
@@ -78,6 +81,7 @@ export class PrismaAuthRepository implements AuthRepository {
             email: user.email,
             role: user.role as 'USER' | 'ADMIN',
             isActive: user.isActive,
+            isEmailVerified: false,
         }
     }
 
@@ -314,7 +318,7 @@ export class PrismaAuthRepository implements AuthRepository {
                 },
             })
 
-            if (!user || !user.isActive || !user.emailVerifiedAt) {
+            if (!user || !user.isActive) {
                 await tx.session.update({
                     where: { id: session.id },
                     data: { revokedAt: nowDate },
@@ -365,7 +369,11 @@ export class PrismaAuthRepository implements AuthRepository {
 
             return {
                 kind: 'rotated',
-                user: { id: user.id, role: user.role as 'USER' | 'ADMIN' },
+                user: {
+                    id: user.id,
+                    role: user.role as 'USER' | 'ADMIN',
+                    isEmailVerified: Boolean(user.emailVerifiedAt),
+                },
                 refreshTokenExpiresAt,
             }
         })

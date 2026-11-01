@@ -40,6 +40,22 @@ describe('HTTP API', () => {
         expect(response.body.code).toBe('FORBIDDEN')
     })
 
+    it('forbids unverified admin users from listing all users', async () => {
+        const unverifiedAdminToken = await signAccessToken({
+            userId: 'admin-user',
+            role: 'ADMIN',
+            isEmailVerified: false,
+        })
+        const response = await request(app)
+            .get('/api/v1/users')
+            .set('Authorization', `Bearer ${unverifiedAdminToken}`)
+        expect(response.status).toBe(403)
+        expect(response.body.code).toBe('FORBIDDEN')
+        expect(response.body.message).toContain(
+            'Email verification is required',
+        )
+    })
+
     it('protects the user-by-id endpoint', async () => {
         const response = await request(app).get('/api/v1/users/user-123')
         expect(response.status).toBe(401)
@@ -55,6 +71,22 @@ describe('HTTP API', () => {
             .set('Authorization', `Bearer ${userToken}`)
         expect(response.status).toBe(403)
         expect(response.body.code).toBe('FORBIDDEN')
+    })
+
+    it('forbids unverified admin users from retrieving a user by id', async () => {
+        const unverifiedAdminToken = await signAccessToken({
+            userId: 'admin-user',
+            role: 'ADMIN',
+            isEmailVerified: false,
+        })
+        const response = await request(app)
+            .get('/api/v1/users/user-123')
+            .set('Authorization', `Bearer ${unverifiedAdminToken}`)
+        expect(response.status).toBe(403)
+        expect(response.body.code).toBe('FORBIDDEN')
+        expect(response.body.message).toContain(
+            'Email verification is required',
+        )
     })
 
     it('validates password reset payload before reaching persistence', async () => {

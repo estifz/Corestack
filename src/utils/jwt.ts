@@ -7,11 +7,13 @@ export type UserRole = 'USER' | 'ADMIN'
 export interface SignAccessTokenInput {
     userId: string
     role: UserRole
+    isEmailVerified?: boolean
 }
 
 export interface VerifiedAccessTokenPayload {
     sub: string
     role: UserRole
+    isEmailVerified?: boolean
     iat?: number
     exp?: number
 }
@@ -27,8 +29,12 @@ export async function signAccessToken(
     input: SignAccessTokenInput,
 ): Promise<string> {
     const secret = getSecretKey()
+    const claims: Record<string, unknown> = { role: input.role }
+    if (typeof input.isEmailVerified === 'boolean') {
+        claims.isEmailVerified = input.isEmailVerified
+    }
 
-    return new SignJWT({ role: input.role })
+    return new SignJWT(claims)
         .setProtectedHeader({ alg: 'HS256' })
         .setSubject(input.userId)
         .setIssuedAt()
@@ -57,6 +63,7 @@ export async function verifyAccessToken(
         const verifiedPayload: VerifiedAccessTokenPayload = {
             sub: payload.sub,
             role,
+            isEmailVerified: Boolean(payload['isEmailVerified']),
         }
 
         if (typeof payload.iat === 'number') {

@@ -512,8 +512,7 @@ export const openapiSpec = {
                         },
                     },
                     403: {
-                        description:
-                            'Account is inactive or email is not verified',
+                        description: 'Account is inactive',
                         content: {
                             'application/json': {
                                 schema: {
@@ -889,7 +888,8 @@ export const openapiSpec = {
                         },
                     },
                     403: {
-                        description: 'Forbidden: Requires ADMIN role',
+                        description:
+                            'Forbidden: Requires ADMIN role and verified email',
                         content: {
                             'application/json': {
                                 schema: {
@@ -953,7 +953,8 @@ export const openapiSpec = {
                         },
                     },
                     403: {
-                        description: 'Forbidden: Requires ADMIN role',
+                        description:
+                            'Forbidden: Requires ADMIN role and verified email',
                         content: {
                             'application/json': {
                                 schema: {

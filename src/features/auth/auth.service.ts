@@ -1,6 +1,7 @@
 import argon2 from 'argon2'
 import { Temporal } from 'temporal-polyfill/full'
 import { ENV } from '../../config/env.js'
+import { logger } from '../../core/logger/logger.js'
 import {
     BadRequestError,
     ConflictError,
@@ -45,7 +46,14 @@ export class AuthService {
             email: normalizedEmail,
             passwordHash,
         })
-        await this.issueEmailVerification(user.id, user.email)
+        try {
+            await this.issueEmailVerification(user.id, user.email)
+        } catch (error) {
+            logger.error(
+                { err: error, userId: user.id, email: user.email },
+                'Failed to send verification email during registration',
+            )
+        }
         return user
     }
 
@@ -142,10 +150,6 @@ export class AuthService {
             throw new ForbiddenError('Account is inactive')
         }
 
-        if (!user.emailVerifiedAt) {
-            throw new ForbiddenError('Account is not verified')
-        }
-
         const now = Temporal.Now.instant()
         const sessionExpiresAt = now.add({ seconds: ENV.SESSION_TTL_SECONDS })
         const refreshTokenExpiresAt = minInstant(
@@ -165,6 +169,7 @@ export class AuthService {
         const accessToken = await signAccessToken({
             userId: user.id,
             role: user.role,
+            isEmailVerified: Boolean(user.emailVerifiedAt),
         })
 
         return {
@@ -173,6 +178,7 @@ export class AuthService {
                 email: user.email,
                 role: user.role,
                 isActive: user.isActive,
+                isEmailVerified: Boolean(user.emailVerifiedAt),
             },
             accessToken,
             refreshToken,
@@ -200,6 +206,7 @@ export class AuthService {
         const accessToken = await signAccessToken({
             userId: rotation.user.id,
             role: rotation.user.role,
+            isEmailVerified: rotation.user.isEmailVerified,
         })
 
         return {

@@ -27,6 +27,7 @@ export class MongoAuthRepository implements AuthRepository {
             email: user.email,
             role: user.role,
             isActive: user.isActive,
+            isEmailVerified: Boolean(user.emailVerifiedAt),
             passwordHash: user.passwordHash,
             emailVerifiedAt: user.emailVerifiedAt,
         }
@@ -43,6 +44,7 @@ export class MongoAuthRepository implements AuthRepository {
             email: user.email,
             role: user.role,
             isActive: user.isActive,
+            isEmailVerified: Boolean(user.emailVerifiedAt),
         }
     }
 
@@ -57,6 +59,7 @@ export class MongoAuthRepository implements AuthRepository {
             email: user.email,
             role: user.role,
             isActive: user.isActive,
+            isEmailVerified: false,
         }
     }
 
@@ -250,7 +253,7 @@ export class MongoAuthRepository implements AuthRepository {
         if (!activeSession) return { kind: 'invalid' }
 
         const user = await UserModel.findById(session.userId)
-        if (!user || !user.isActive || !user.emailVerifiedAt) {
+        if (!user || !user.isActive) {
             await SessionModel.updateOne(
                 { _id: session._id, revokedAt: null },
                 { $set: { revokedAt: nowDate } },
@@ -299,7 +302,11 @@ export class MongoAuthRepository implements AuthRepository {
 
         return {
             kind: 'rotated',
-            user: { id: user._id.toString(), role: user.role },
+            user: {
+                id: user._id.toString(),
+                role: user.role,
+                isEmailVerified: Boolean(user.emailVerifiedAt),
+            },
             refreshTokenExpiresAt,
         }
     }

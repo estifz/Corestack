@@ -15,6 +15,20 @@ describe('access tokens', () => {
         })
     })
 
+    it('signs and verifies isEmailVerified claim when provided', async () => {
+        const token = await signAccessToken({
+            userId: 'user-123',
+            role: 'USER',
+            isEmailVerified: true,
+        })
+
+        await expect(verifyAccessToken(token)).resolves.toMatchObject({
+            sub: 'user-123',
+            role: 'USER',
+            isEmailVerified: true,
+        })
+    })
+
     it('rejects a token with an invalid signature', async () => {
         await expect(verifyAccessToken('not-a-jwt')).rejects.toBeInstanceOf(
             UnauthorizedError,

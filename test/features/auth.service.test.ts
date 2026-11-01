@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AuthService } from '../../src/features/auth/auth.service.js'
+import { logger } from '../../src/core/logger/logger.js'
 import type { AuthRepository } from '../../src/features/auth/auth.repository.js'
 import type {
     AuthUser,
@@ -29,6 +30,7 @@ const verifiedUser: UserRecord = {
     email: 'person@example.com',
     role: 'USER',
     isActive: true,
+    isEmailVerified: true,
     passwordHash: 'hashed-password',
     emailVerifiedAt: new Date(),
 }
@@ -42,9 +44,12 @@ function makeRepository(overrides: Partial<AuthRepository> = {}) {
             email: 'person@example.com',
             role: 'USER',
             isActive: true,
+            isEmailVerified: false,
         } satisfies AuthUser),
         createEmailVerificationToken: vi.fn().mockResolvedValue(undefined),
         verifyEmail: vi.fn().mockResolvedValue(false),
+        createPasswordResetToken: vi.fn().mockResolvedValue(undefined),
+        resetPassword: vi.fn().mockResolvedValue(true),
         createSession: vi.fn().mockResolvedValue(undefined),
         rotateRefreshToken: vi.fn().mockResolvedValue({ kind: 'invalid' }),
         revokeSessionByRefreshTokenHash: vi.fn().mockResolvedValue(undefined),
@@ -90,6 +95,50 @@ describe('AuthService', () => {
         expect(result.id).toBe('user-1')
     })
 
+    it('succeeds registration and logs error when verification email fails to send', async () => {
+        const loggerSpy = vi
+            .spyOn(logger, 'error')
+            .mockImplementation(() => logger)
+        sendVerificationEmail.mockRejectedValueOnce(
+            new Error('Resend API key missing or invalid'),
+        )
+        const repository = makeRepository()
+        const service = new AuthService(repository)
+
+        const result = await service.register({
+            email: 'person@example.com',
+            password: 'very-secret',
+        })
+
+        expect(repository.createUser).toHaveBeenCalled()
+        expect(loggerSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                userId: 'user-1',
+                email: 'person@example.com',
+            }),
+            'Failed to send verification email during registration',
+        )
+        expect(result.id).toBe('user-1')
+        loggerSpy.mockRestore()
+    })
+
+    it('propagates email failure when resending verification email', async () => {
+        sendVerificationEmail.mockRejectedValueOnce(
+            new Error('Resend service unavailable'),
+        )
+        const repository = makeRepository({
+            findUserByEmail: vi.fn().mockResolvedValue({
+                ...verifiedUser,
+                emailVerifiedAt: null,
+            }),
+        })
+        const service = new AuthService(repository)
+
+        await expect(
+            service.resendVerificationEmail('person@example.com'),
+        ).rejects.toThrow('Resend service unavailable')
+    })
+
     it('rejects registration when the email already exists', async () => {
         const repository = makeRepository({
             findUserByEmail: vi.fn().mockResolvedValue(verifiedUser),
@@ -129,7 +178,7 @@ describe('AuthService', () => {
         expect(result.refreshTokenMaxAgeMs).toBeGreaterThan(0)
     })
 
-    it('rejects unknown users and unverified accounts at login', async () => {
+    it('rejects unknown users at login', async () => {
         const missing = new AuthService(makeRepository())
         await expect(
             missing.login(
@@ -137,21 +186,24 @@ describe('AuthService', () => {
                 { ipAddress: null, userAgent: null },
             ),
         ).rejects.toThrow('Invalid credentials')
+    })
 
+    it('allows unverified accounts to log in with isEmailVerified false', async () => {
         const unverified = new AuthService(
             makeRepository({
                 findUserByEmail: vi.fn().mockResolvedValue({
                     ...verifiedUser,
                     emailVerifiedAt: null,
+                    isEmailVerified: false,
                 }),
             }),
         )
-        await expect(
-            unverified.login(
-                { email: verifiedUser.email, password: 'correct-password' },
-                { ipAddress: null, userAgent: null },
-            ),
-        ).rejects.toThrow('not verified')
+        const result = await unverified.login(
+            { email: verifiedUser.email, password: 'correct-password' },
+            { ipAddress: null, userAgent: null },
+        )
+        expect(result.user.isEmailVerified).toBe(false)
+        expect(result.accessToken).toEqual(expect.any(String))
     })
 
     it('rejects inactive accounts and incorrect passwords', async () => {
