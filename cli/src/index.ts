@@ -88,20 +88,7 @@ const program = new Command()
                 s.stop('Project files scaffolded and configured.')
 
                 if (!flags?.skipInstall) {
-                    // 2. Git initialization
-                    s.start('Initializing git repository...')
-                    const gitSuccess = await initGit(config.projectPath)
-                    if (gitSuccess) {
-                        s.stop('Git repository initialized.')
-                    } else {
-                        s.stop(
-                            pc.yellow(
-                                'Git repository initialization skipped (git command unavailable).',
-                            ),
-                        )
-                    }
-
-                    // 3. Dependency installation
+                    // 2. Dependency installation
                     s.start(
                         `Installing dependencies with ${config.packageManager}...`,
                     )
@@ -111,7 +98,7 @@ const program = new Command()
                     )
                     s.stop('Dependencies installed successfully.')
 
-                    // 4. Prisma client generation (Postgres only)
+                    // 3. Prisma client generation (Postgres only)
                     if (config.databaseProvider === 'postgres') {
                         s.start('Generating Prisma client...')
                         await runPrismaGenerate(
@@ -121,15 +108,24 @@ const program = new Command()
                         s.stop('Prisma client generated.')
                     }
 
-                    // 5. Ensure all generated and tailored files conform to Prettier
+                    // 4. Ensure all generated and tailored files conform to Prettier
                     await formatProject(
                         config.projectPath,
                         config.packageManager,
                     )
 
-                    // 6. Create the initial git commit
+                    // 5. Git repository initialization, staging, and initial commit
+                    s.start('Initializing git repository...')
+                    const gitSuccess = await initGit(config.projectPath)
                     if (gitSuccess) {
+                        s.stop('Git repository initialized.')
                         await commitInitialFiles(config.projectPath)
+                    } else {
+                        s.stop(
+                            pc.yellow(
+                                'Git repository initialization skipped (git command unavailable).',
+                            ),
+                        )
                     }
                 }
 
