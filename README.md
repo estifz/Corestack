@@ -311,8 +311,6 @@ EMAIL_VERIFICATION_TTL_SECONDS=86400
 PASSWORD_RESET_TTL_SECONDS=900
 ```
 
-`JWT_SECRET` is required. In production, `REFRESH_COOKIE_SECURE` must be `true`; it must also be `true` when `REFRESH_COOKIE_SAME_SITE=none`.
-
 ### Authentication
 
 Authentication routes are mounted under `/api/v1/auth`:

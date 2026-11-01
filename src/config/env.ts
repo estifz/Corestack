@@ -6,9 +6,7 @@ dotenv.config()
 const envSchema = z
     .object({
         PORT: z.coerce.number(),
-        NODE_ENV: z
-            .enum(['development', 'test', 'production'])
-            .default('development'),
+        NODE_ENV: z.enum(['development', 'test', 'production']),
         LOG_LEVEL: z.string(),
         RATE_LIMIT_WINDOW: z.coerce.number(),
         RATE_LIMIT_REQUEST: z.coerce.number(),
@@ -16,7 +14,7 @@ const envSchema = z
         DATABASE_URL: z.string().optional(),
         MONGODB_URI: z.string().optional(),
         RESEND_API_KEY: z.string().optional(),
-        RESEND_FROM_EMAIL: z.string().min(1).default('onboarding@resend.dev'),
+        RESEND_FROM_EMAIL: z.string().min(1, 'RESEND_FROM_EMAIL is required'),
         API_BASE_URL: z.string().url(),
         EMAIL_VERIFICATION_TTL_SECONDS: z.coerce
             .number()
@@ -40,7 +38,9 @@ const envSchema = z
             .int()
             .positive()
             .default(2592000),
-        REFRESH_COOKIE_NAME: z.string().min(1).default('refresh_token'),
+        REFRESH_COOKIE_NAME: z
+            .string()
+            .min(1, 'REFRESH_COOKIE_NAME is required'),
         REFRESH_COOKIE_SAME_SITE: z
             .enum(['strict', 'lax', 'none'])
             .default('lax'),
@@ -80,12 +80,5 @@ const envSchema = z
 type Env = z.infer<typeof envSchema>
 
 const env = envSchema.parse(process.env)
-
-if (env.REFRESH_COOKIE_SAME_SITE === 'none' && !env.REFRESH_COOKIE_SECURE) {
-    throw new Error('REFRESH_COOKIE_SECURE must be true when SameSite=None')
-}
-if (env.NODE_ENV === 'production' && !env.REFRESH_COOKIE_SECURE) {
-    throw new Error('REFRESH_COOKIE_SECURE must be true in production')
-}
 
 export const ENV: Env = env

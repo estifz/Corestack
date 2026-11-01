@@ -12,5 +12,7 @@ process.env.DATABASE_URL ??=
 process.env.JWT_SECRET ??= 'test-secret-that-is-long-enough-for-hmac'
 process.env.JWT_EXPIRES_IN ??= '15m'
 process.env.RESEND_API_KEY ??= 're_test_key'
+process.env.RESEND_FROM_EMAIL ??= 'CoreStack <onboarding@resend.dev>'
+process.env.REFRESH_COOKIE_NAME ??= 'refresh_token'
 process.env.PASSWORD_RESET_TTL_SECONDS ??= '900'
 process.env.CORS_ORIGINS ??= 'http://localhost:3000'
