@@ -49,7 +49,7 @@ Phase 3 implements an end-to-end, production-grade authentication and user manag
 - **Password Recovery**: Secure forgot-password flow with one-time tokens and reset-password endpoint that updates credentials and revokes all active sessions.
 - **Role-Based Access Control (RBAC) & Users**: Role middleware (`USER`, `ADMIN`), admin-restricted paginated user listing, admin user lookup, and authenticated user profile endpoint (`/api/v1/auth/me`).
 - **Interactive Documentation**: Interactive API reference powered by Scalar at `/docs`, full OpenAPI 3.1 schema at `/openapi.json`, and an in-editor HTTP request collection (`docs/requests.http`).
-- **Containerization & Docker**: Multi-stage production Dockerfile (Alpine-based, BuildKit caching, lean ~109 MB content size) and Docker Compose orchestration for PostgreSQL, MongoDB, and App.
+- **Containerization & Docker**: Minimal production Dockerfile (Alpine-based, Node 24) and hardened Docker Compose orchestration for PostgreSQL, MongoDB, and App.
 - **Testing & CI Pipeline**: Vitest test suite with Supertest route coverage, mock repository DIP testing, and a lightweight GitHub Actions CI workflow running tests on push and PR.
 
 ### `v0.4.0` — Phase 4: Pluggable Multi-Database Architecture (MongoDB & Mongoose)
@@ -69,15 +69,22 @@ Phase 5 transitions the PostgreSQL persistence foundation from experimental Pris
 
 - **Prisma 7 Migration**: Fully migrated from experimental Prisma 8 contracts (`@prisma/orm-postgres`, `prisma contract emit`, `prisma db migrate`) to stable, battle-tested **Prisma 7** (`@prisma/client` 7.10.x, `@prisma/adapter-pg`, and `@prisma/config`).
 
+### `v0.6.0` — Phase 6: CLI Scaffolding
+
+Phase 6 introduces the interactive project scaffolding CLI (`create-corestack`), allowing developers to bootstrap tailored production backends from the CoreStack baseline:
+
+- **Interactive & Preset Workflows**: Choose between the **Recommended** stack (PostgreSQL, Complete Auth, Scalar Docs, Docker) or **Customize** interactively (pick DB, toggle Auth, toggle Docs, toggle Docker).
+- **Modular Pruning Engine**: Dependency-aware pruning that strictly removes unused database files, auth routes, models, schemas, and dependencies without leaving dangling imports.
+- **Cross-Platform Automation**: Automated git initialization, dependency installation, Prisma client generation, and Prettier formatting for any detected package manager (`pnpm`, `npm`, `yarn`, `bun`).
+
 ### Roadmap & Scope
 
-CoreStack currently covers the complete core foundation: modular feature architecture, security middleware, authentication with session rotation, RBAC, API documentation, pluggable PostgreSQL & MongoDB persistence, Docker orchestration, and automated CI testing.
+CoreStack currently covers the complete core foundation: modular feature architecture, security middleware, authentication with session rotation, RBAC, API documentation, pluggable PostgreSQL & MongoDB persistence, Docker orchestration, automated CI testing, and interactive project scaffolding.
 
 Future modules planned for CoreStack:
 
 - **Object Storage**: S3-compatible cloud storage adapter (AWS S3, Cloudflare R2, MinIO).
 - **Background Jobs & Queues**: Asynchronous worker processing (BullMQ / Redis).
-- **CLI Scaffolding Tool**: Interactive project generator (`corestack create`) for custom stack selection.
 
 ---
 
@@ -139,7 +146,7 @@ CoreStack follows a **feature-based architecture** with clear separation between
 ├── test/                 # Vitest unit and HTTP integration tests
 ├── .dockerignore         # Docker context exclusion rules
 ├── compose.yaml          # Docker Compose (PostgreSQL, MongoDB, Mongo Express, App)
-└── Dockerfile            # Multi-stage production container build
+└── Dockerfile            # Minimal production container build
 ```
 
 ### Request Flow
@@ -290,6 +297,11 @@ CORS_ORIGINS=http://localhost:3000
 RATE_LIMIT_WINDOW=60000
 RATE_LIMIT_REQUEST=100
 
+# Database Credentials (for Docker & Local PostgreSQL)
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=password
+POSTGRES_DB=corestack
+
 # Database Provider ('postgres' | 'mongodb')
 DATABASE_PROVIDER=postgres
 
@@ -438,6 +450,19 @@ Start the production build:
 ```bash
 pnpm start
 ```
+
+### Security & Reverse Proxies (`trust proxy`)
+
+By default, CoreStack explicitly sets `app.set('trust proxy', false)` in `src/app.ts`.
+
+#### Updating for Production Deployments
+
+When running behind a trusted reverse proxy, load balancer, or cloud hosting platform, client requests pass through the proxy before reaching Node.js. To allow `express-rate-limit` and logging middleware to accurately identify individual client IPs rather than bucketing all requests under the proxy's IP, configure `src/app.ts`:
+
+- **Single Proxy / Cloud Container** (Nginx, AWS ALB, Render, Railway, Fly.io, GCP Cloud Run):
+    ```typescript
+    app.set('trust proxy', 1)
+    ```
 
 ## Contributing
 

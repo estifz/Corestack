@@ -33,7 +33,7 @@ export function transformReadme(config: ProjectConfig): void {
         content += `- **API Documentation**: Interactive Scalar API reference at \`/docs\` and OpenAPI 3.1 schema at \`/openapi.json\`\n`
     }
     if (config.includeDocker) {
-        content += `- **Containerization**: Multi-stage Dockerfile and Docker Compose orchestration\n`
+        content += `- **Containerization**: Minimal production Dockerfile and Docker Compose orchestration\n`
     }
 
     content += `- **Testing & Quality**: Vitest suite with Supertest, Prettier, and Husky pre-commit hooks
@@ -143,6 +143,21 @@ The server will start listening at \`http://localhost:3000\`.
 - \`GET /api/v1/users\` — Paginated user directory (Admin restricted)
 `
     }
+
+    content += `
+---
+
+## Security & Reverse Proxies (\`trust proxy\`)
+
+By default, \`app.set('trust proxy', false)\` is configured in \`src/app.ts\` to prevent IP spoofing when exposed directly to the internet.
+
+If you deploy behind a reverse proxy or cloud platform (Nginx, Cloudflare, AWS ALB, Render, Railway, Fly.io, Cloud Run), update \`src/app.ts\` to trust your proxy hop:
+
+\`\`\`typescript
+// Trust the first reverse proxy hop
+app.set('trust proxy', 1)
+\`\`\`
+`
 
     fs.writeFileSync(path.join(root, 'README.md'), content, 'utf-8')
 }

@@ -177,4 +177,91 @@ exec "$@"
             fs.writeFileSync(entrypointFile, entrypointContent, { mode: 0o755 })
         }
     }
+
+    // Generate minimal, production Dockerfile tailored to package manager and database
+    const dockerfilePath = path.join(root, 'Dockerfile')
+    if (fs.existsSync(dockerfilePath)) {
+        fs.writeFileSync(
+            dockerfilePath,
+            generateMinimalDockerfile(config),
+            'utf-8',
+        )
+    }
+}
+
+function generateMinimalDockerfile(config: ProjectConfig): string {
+    const isPostgres = config.databaseProvider === 'postgres'
+    const pm = config.packageManager
+
+    const opensslLine = isPostgres
+        ? 'RUN apk add --no-cache libc6-compat openssl\n\n'
+        : ''
+
+    if (pm === 'bun') {
+        return `FROM oven/bun:1-alpine
+WORKDIR /app
+
+${opensslLine}COPY package.json bun.lock* ./
+RUN bun install
+
+COPY . .
+RUN chmod +x ./docker-entrypoint.sh
+RUN bun run build
+
+EXPOSE 3000
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
+CMD ["bun", "dist/server.js"]
+`
+    }
+
+    if (pm === 'pnpm') {
+        return `FROM node:24-alpine
+WORKDIR /app
+
+${opensslLine}RUN npm install -g pnpm@11.15.1 --force
+COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml* ./
+RUN pnpm install
+
+COPY . .
+RUN chmod +x ./docker-entrypoint.sh
+RUN pnpm build
+
+EXPOSE 3000
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
+CMD ["node", "dist/server.js"]
+`
+    }
+
+    if (pm === 'yarn') {
+        return `FROM node:24-alpine
+WORKDIR /app
+
+${opensslLine}COPY package.json yarn.lock* ./
+RUN yarn install
+
+COPY . .
+RUN chmod +x ./docker-entrypoint.sh
+RUN yarn build
+
+EXPOSE 3000
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
+CMD ["node", "dist/server.js"]
+`
+    }
+
+    // Default: npm
+    return `FROM node:24-alpine
+WORKDIR /app
+
+${opensslLine}COPY package*.json ./
+RUN npm install
+
+COPY . .
+RUN chmod +x ./docker-entrypoint.sh
+RUN npm run build
+
+EXPOSE 3000
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
+CMD ["node", "dist/server.js"]
+`
 }

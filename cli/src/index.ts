@@ -5,7 +5,7 @@ import pc from 'picocolors'
 import { runPrompts } from './prompts.js'
 import { scaffoldProject } from './scaffold.js'
 import type { CliFlags, ProjectConfig } from './types.js'
-import { initGit } from './utils/git.js'
+import { commitInitialFiles, initGit } from './utils/git.js'
 import {
     formatProject,
     installDependencies,
@@ -126,6 +126,11 @@ const program = new Command()
                         config.projectPath,
                         config.packageManager,
                     )
+
+                    // 6. Create the initial git commit
+                    if (gitSuccess) {
+                        await commitInitialFiles(config.projectPath)
+                    }
                 }
 
                 // 6. Build tailored next steps instructions
@@ -169,15 +174,6 @@ const program = new Command()
 
                 steps.push(`${stepNum++}. Start the development server:`)
                 steps.push(`   ${pc.cyan(getRunCommand(pm, 'dev'))}`)
-
-                if (config.includeAuth) {
-                    steps.push('')
-                    steps.push(
-                        pc.yellow(
-                            'Note: A placeholder JWT_SECRET is set in .env. Generate and set a strong, random 32+ char secret before production deployment.',
-                        ),
-                    )
-                }
 
                 note(
                     steps.join('\n'),

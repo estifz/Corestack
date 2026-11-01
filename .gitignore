@@ -7,11 +7,21 @@ node_modules/
 dist/
 build/
 
+coverage/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+.husky/_
+
 .vscode/*
 !.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
 
-# doc
-md/ 
-
-# CLI generated template bundle
+md/
 cli/template/

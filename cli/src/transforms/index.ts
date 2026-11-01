@@ -6,6 +6,7 @@ import { transformDocker } from './docker.js'
 import { transformEnv } from './env.js'
 import { transformPackageJson } from './package-json.js'
 import { transformReadme } from './readme.js'
+import { transformVscode } from './vscode.js'
 
 export function applyTransforms(config: ProjectConfig): void {
     // 1. Prune & isolate database provider (Postgres vs Mongo)
@@ -28,4 +29,7 @@ export function applyTransforms(config: ProjectConfig): void {
 
     // 7. Generate tailored child README.md
     transformReadme(config)
+
+    // 8. Generate tailored .vscode configuration
+    transformVscode(config)
 }

@@ -40,6 +40,7 @@ const EXCLUDE_PATTERNS = [
     /(^|[/\\])\.env$/,
     /(^|[/\\])\.env\..+$/,
     /(^|[/\\])cli([/\\]|$)/,
+    /(^|[/\\])\.husky[/\\]_([/\\]|$)/,
 ]
 
 function shouldExclude(sourcePath: string): boolean {

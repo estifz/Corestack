@@ -14,6 +14,8 @@ import { NotFoundError } from './utils/errors/appError.js'
 
 const app = express()
 
+app.set('trust proxy', false)
+
 morgan.token('url', (req) => {
     const rawUrl = (req as express.Request).originalUrl || req.url || ''
     return rawUrl.replace(
@@ -29,11 +31,11 @@ app.use(
     }),
 )
 app.use(helmet())
+app.use(limiter)
 app.use(compression())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(morgan(ENV.NODE_ENV === 'production' ? 'combined' : 'dev'))
-app.use(limiter)
 
 app.use(healthRoutes)
 app.use(docsRoutes)

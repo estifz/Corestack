@@ -68,24 +68,28 @@ export function transformPackageJson(config: ProjectConfig): void {
 
     fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 4) + '\n', 'utf-8')
 
-    // 7. Adapt pnpm-workspace.yaml
+    // 7. Adapt or clean up pnpm-workspace.yaml
     const workspaceYamlPath = path.join(root, 'pnpm-workspace.yaml')
     if (fs.existsSync(workspaceYamlPath)) {
-        let builds: Record<string, boolean> = {
-            esbuild: true,
-        }
-        if (isPostgres) {
-            builds['@prisma/engines'] = true
-            builds['prisma'] = true
-        }
-        if (config.includeAuth) {
-            builds['argon2'] = true
-        }
+        if (config.packageManager !== 'pnpm') {
+            fs.rmSync(workspaceYamlPath, { force: true })
+        } else {
+            let builds: Record<string, boolean> = {
+                esbuild: true,
+            }
+            if (isPostgres) {
+                builds['@prisma/engines'] = true
+                builds['prisma'] = true
+            }
+            if (config.includeAuth) {
+                builds['argon2'] = true
+            }
 
-        let yaml = 'allowBuilds:\n'
-        for (const [name, val] of Object.entries(builds)) {
-            yaml += `    '${name}': ${val}\n`
+            let yaml = 'allowBuilds:\n'
+            for (const [name, val] of Object.entries(builds)) {
+                yaml += `    '${name}': ${val}\n`
+            }
+            fs.writeFileSync(workspaceYamlPath, yaml, 'utf-8')
         }
-        fs.writeFileSync(workspaceYamlPath, yaml, 'utf-8')
     }
 }
