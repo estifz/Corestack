@@ -113,12 +113,13 @@ describe('HTTP API', () => {
 
     // 6. If Docs are enabled, tailor openapi.ts to only System endpoints
     if (config.includeDocs) {
+        // 6. If Docs are enabled, tailor openapi.ts to only System endpoints and update test
         const openapiFile = path.join(root, 'src', 'docs', 'openapi.ts')
         if (fs.existsSync(openapiFile)) {
             const cleanOpenapi = `export const openapiSpec = {
     openapi: '3.1.0',
     info: {
-        title: '${config.projectName} API',
+        title: 'CoreStack API',
         version: '1.0.0',
         description: 'A production-oriented TypeScript backend built with CoreStack.',
     },
@@ -183,6 +184,36 @@ describe('HTTP API', () => {
 }
 `
             fs.writeFileSync(openapiFile, cleanOpenapi, 'utf-8')
+        }
+
+        const docsTestFile = path.join(root, 'test', 'docs.routes.test.ts')
+        if (fs.existsSync(docsTestFile)) {
+            const cleanDocsTest = `import request from 'supertest'
+import { describe, expect, it } from 'vitest'
+import app from '../src/app.js'
+
+describe('API Documentation Routes', () => {
+    it('serves the OpenAPI 3.1 specification at /openapi.json', async () => {
+        const response = await request(app).get('/openapi.json')
+
+        expect(response.status).toBe(200)
+        expect(response.headers['content-type']).toContain('application/json')
+        expect(response.body.openapi).toBe('3.1.0')
+        expect(response.body.info.title).toBe('CoreStack API')
+        expect(response.body.paths).toHaveProperty('/health')
+    })
+
+    it('serves the Scalar interactive documentation page at /docs', async () => {
+        const response = await request(app).get('/docs')
+
+        expect(response.status).toBe(200)
+        expect(response.headers['content-type']).toContain('text/html')
+        expect(response.text).toContain('CoreStack API Documentation')
+        expect(response.headers['content-security-policy']).toBeUndefined()
+    })
+})
+`
+            fs.writeFileSync(docsTestFile, cleanDocsTest, 'utf-8')
         }
     }
 }
