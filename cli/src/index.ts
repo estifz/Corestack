@@ -6,7 +6,11 @@ import { runPrompts } from './prompts.js'
 import { scaffoldProject } from './scaffold.js'
 import type { CliFlags, ProjectConfig } from './types.js'
 import { initGit } from './utils/git.js'
-import { installDependencies, runPrismaGenerate } from './utils/installer.js'
+import {
+    formatProject,
+    installDependencies,
+    runPrismaGenerate,
+} from './utils/installer.js'
 import { detectPackageManager, getRunCommand } from './utils/pm.js'
 
 const program = new Command()
@@ -119,9 +123,15 @@ const program = new Command()
                         )
                         s.stop('Prisma client generated.')
                     }
+
+                    // 5. Ensure all generated and tailored files conform to Prettier
+                    await formatProject(
+                        config.projectPath,
+                        config.packageManager,
+                    )
                 }
 
-                // 5. Build tailored next steps instructions
+                // 6. Build tailored next steps instructions
                 const pm = config.packageManager
                 const steps: string[] = []
 

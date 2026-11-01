@@ -42,6 +42,7 @@ export const DEPENDENCY_MAP = {
             'src/middlewares/requireTrustedOrigin.ts',
             'src/utils/jwt.ts',
             'src/utils/token.ts',
+            'src/types/express.d.ts',
             'test/features/auth.service.test.ts',
             'test/features/auth.validation.test.ts',
             'test/features/auth.tokens.test.ts',

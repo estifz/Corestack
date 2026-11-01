@@ -28,3 +28,14 @@ export async function runPrismaGenerate(
         stdio: 'ignore',
     })
 }
+
+export async function formatProject(
+    projectPath: string,
+    pm: PackageManager,
+): Promise<void> {
+    const args = pm === 'npm' || pm === 'bun' ? ['run', 'format'] : ['format']
+    await execa(pm, args, {
+        cwd: projectPath,
+        stdio: 'ignore',
+    })
+}
