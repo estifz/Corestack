@@ -1,7 +1,9 @@
-import { outro } from '@clack/prompts'
+import path from 'node:path'
+import { outro, spinner } from '@clack/prompts'
 import { Command } from 'commander'
 import pc from 'picocolors'
 import { runPrompts } from './prompts.js'
+import { scaffoldBaseProject } from './scaffold.js'
 import type { CliFlags, ProjectConfig } from './types.js'
 import { detectPackageManager } from './utils/pm.js'
 
@@ -22,8 +24,9 @@ const program = new Command()
             let config: ProjectConfig
 
             if (flags?.recommended) {
-                const projectName = targetDir?.trim() || 'my-app'
-                const projectPath = `${process.cwd()}/${projectName}`
+                const rawDir = targetDir?.trim() || 'my-app'
+                const projectPath = path.resolve(process.cwd(), rawDir)
+                const projectName = path.basename(projectPath)
                 config = {
                     projectName,
                     projectPath,
@@ -37,7 +40,7 @@ const program = new Command()
                 config = await runPrompts(targetDir)
             }
 
-            // Summary of captured config (Phase 1 validation)
+            // Summary of captured config
             console.log('\n' + pc.bold(pc.green('Selected Configuration:')))
             console.log(
                 `  ${pc.cyan('Project Name:')}     ${config.projectName}`,
@@ -62,11 +65,21 @@ const program = new Command()
             )
             console.log('')
 
+            const s = spinner()
+            s.start('Scaffolding base project files...')
+
+            await scaffoldBaseProject(config)
+
+            s.stop('Base project files scaffolded successfully.')
+
             outro(
-                pc.cyan('Phase 1 prompt verification completed successfully.'),
+                pc.green(`Base scaffolding complete in ${config.projectPath}`),
             )
         } catch (error) {
-            console.error(pc.red('Unexpected error:'), error)
+            console.error(
+                pc.red('Error:'),
+                error instanceof Error ? error.message : error,
+            )
             process.exit(1)
         }
     })

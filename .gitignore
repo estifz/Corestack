@@ -12,3 +12,6 @@ build/
 
 # doc
 md/ 
+
+# CLI generated template bundle
+cli/template/

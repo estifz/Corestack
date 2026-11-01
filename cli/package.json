@@ -7,9 +7,14 @@
         "create-corestack": "./dist/index.js"
     },
     "main": "./dist/index.js",
+    "files": [
+        "dist",
+        "template"
+    ],
     "scripts": {
         "dev": "tsx src/index.ts",
-        "build": "tsup",
+        "bundle:template": "tsx scripts/bundle-template.ts",
+        "build": "tsx scripts/bundle-template.ts && tsup",
         "typecheck": "tsc --noEmit"
     },
     "keywords": [
