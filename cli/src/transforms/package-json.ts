@@ -13,8 +13,9 @@ export function transformPackageJson(config: ProjectConfig): void {
 
     const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'))
 
-    // 1. Set project name
+    // 1. Set project name and remove devEngines restriction
     pkg.name = config.projectName
+    delete pkg.devEngines
 
     // 2. Remove monorepo CLI scripts and multi-db scripts
     delete pkg.scripts['cli:dev']
