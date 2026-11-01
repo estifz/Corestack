@@ -4,6 +4,8 @@
     "description": "",
     "main": "server.js",
     "scripts": {
+        "cli:dev": "tsx cli/src/index.ts",
+        "cli:build": "pnpm --filter create-corestack build",
         "dev": "nodemon --exec tsx ./src/server.ts",
         "build": "prisma generate --no-hints && tsc",
         "typecheck": "tsc --noEmit",

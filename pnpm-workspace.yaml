@@ -1,3 +1,7 @@
+packages:
+    - '.'
+    - 'cli'
+
 allowBuilds:
     '@prisma/engines': true
     argon2: true
