@@ -76,11 +76,19 @@ export async function scaffoldProject(config: ProjectConfig): Promise<void> {
         fs.writeFileSync(huskyPreCommit, 'npx lint-staged\n', { mode: 0o755 })
     }
 
-    // 5. Automatically resolve available port for the database
+    // 5. Automatically resolve available port for the database and web UI
     if (config.dbPort === undefined) {
         const preferredPort =
             config.databaseProvider === 'postgres' ? 5432 : 27017
         config.dbPort = await findAvailablePort(preferredPort)
+    }
+
+    if (
+        config.databaseProvider === 'mongodb' &&
+        config.includeDocker &&
+        config.mongoExpressPort === undefined
+    ) {
+        config.mongoExpressPort = await findAvailablePort(8081)
     }
 
     // 6. Apply modular transformations based on selections

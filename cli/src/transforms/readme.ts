@@ -79,13 +79,14 @@ ${runMigrate}
 `
     } else {
         if (config.includeDocker) {
+            const mongoExpressPort = config.mongoExpressPort ?? 8081
             content += `Start MongoDB and Mongo Express administration UI:
 
 \`\`\`bash
 docker compose up -d mongodb mongo-express
 \`\`\`
 
-Mongo Express web GUI will be available at \`http://localhost:8081\`.
+Mongo Express web GUI will be available at \`http://localhost:${mongoExpressPort}\`.
 `
         }
     }

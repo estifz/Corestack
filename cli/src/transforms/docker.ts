@@ -91,6 +91,8 @@ volumes:
 `
         } else {
             // MongoDB
+            const mongoExpressPort = config.mongoExpressPort ?? 8081
+
             composeContent = `name: ${config.projectName}
 
 services:
@@ -111,7 +113,7 @@ services:
         image: mongo-express:latest
         restart: unless-stopped
         ports:
-            - '8081:8081'
+            - '${mongoExpressPort}:8081'
         environment:
             ME_CONFIG_MONGODB_SERVER: mongodb
             ME_CONFIG_MONGODB_PORT: 27017

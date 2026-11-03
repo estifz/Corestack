@@ -13,6 +13,7 @@ export interface ProjectConfig {
     includeDocker: boolean
     packageManager: PackageManager
     dbPort?: number
+    mongoExpressPort?: number
 }
 
 export interface CliFlags {

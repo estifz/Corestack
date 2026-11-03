@@ -133,6 +133,7 @@ const program = new Command()
                     steps.push('')
                 } else {
                     if (config.includeDocker) {
+                        const mongoExpressPort = config.mongoExpressPort ?? 8081
                         steps.push(
                             `${stepNum++}. Start MongoDB and Mongo Express UI:`,
                         )
@@ -140,7 +141,7 @@ const program = new Command()
                             `   ${pc.cyan('docker compose up -d mongodb mongo-express')}`,
                         )
                         steps.push(
-                            `   ${pc.dim('(Mongo Express admin UI at http://localhost:8081)')}`,
+                            `   ${pc.dim(`(Mongo Express admin UI at http://localhost:${mongoExpressPort})`)}`,
                         )
                         steps.push('')
                     }
