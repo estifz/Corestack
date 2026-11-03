@@ -27,4 +27,15 @@ export function transformDocs(config: ProjectConfig): void {
             .replace('app.use(docsRoutes)\n', '')
         fs.writeFileSync(appFile, appCode, 'utf-8')
     }
+
+    // 3. Remove raw OpenAPI specification request from docs/requests.http
+    const requestsHttpFile = path.join(root, 'docs', 'requests.http')
+    if (fs.existsSync(requestsHttpFile)) {
+        let content = fs.readFileSync(requestsHttpFile, 'utf-8')
+        content = content.replace(
+            /\n*### 3\. Raw OpenAPI Specification\nGET \{\{baseUrl\}\}\/openapi\.json\n*/,
+            '\n',
+        )
+        fs.writeFileSync(requestsHttpFile, content, 'utf-8')
+    }
 }

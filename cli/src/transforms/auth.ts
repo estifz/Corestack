@@ -216,4 +216,19 @@ describe('API Documentation Routes', () => {
             fs.writeFileSync(docsTestFile, cleanDocsTest, 'utf-8')
         }
     }
+
+    // 7. Prune auth and users from docs/requests.http
+    const requestsHttpFile = path.join(root, 'docs', 'requests.http')
+    if (fs.existsSync(requestsHttpFile)) {
+        let content = fs.readFileSync(requestsHttpFile, 'utf-8')
+        content = content.replace(
+            /\n*# Paste your access token here after logging in\n@accessToken = [^\n]+\n*/,
+            '\n\n',
+        )
+        const authEndpointsIndex = content.indexOf('# Authentication Endpoints')
+        if (authEndpointsIndex !== -1) {
+            content = content.substring(0, authEndpointsIndex).trimEnd() + '\n'
+        }
+        fs.writeFileSync(requestsHttpFile, content, 'utf-8')
+    }
 }

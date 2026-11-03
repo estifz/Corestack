@@ -7,6 +7,7 @@ import { transformEnv } from './env.js'
 import { transformPackageJson } from './package-json.js'
 import { transformReadme } from './readme.js'
 import { transformVscode } from './vscode.js'
+import { transformCi } from './ci.js'
 
 export function applyTransforms(config: ProjectConfig): void {
     // 1. Prune & isolate database provider (Postgres vs Mongo)
@@ -32,4 +33,7 @@ export function applyTransforms(config: ProjectConfig): void {
 
     // 8. Generate tailored .vscode configuration
     transformVscode(config)
+
+    // 9. Generate tailored GitHub Actions CI workflow
+    transformCi(config)
 }

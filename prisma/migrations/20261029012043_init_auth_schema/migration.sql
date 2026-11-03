@@ -1,10 +1,7 @@
--- CreateSchema
 CREATE SCHEMA IF NOT EXISTS "auth";
 
--- CreateEnum
 CREATE TYPE "auth"."UserRole" AS ENUM ('USER', 'ADMIN');
 
--- CreateTable
 CREATE TABLE "auth"."users" (
     "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
@@ -18,7 +15,6 @@ CREATE TABLE "auth"."users" (
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
 CREATE TABLE "auth"."sessions" (
     "id" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
@@ -33,7 +29,6 @@ CREATE TABLE "auth"."sessions" (
     CONSTRAINT "sessions_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
 CREATE TABLE "auth"."refresh_tokens" (
     "id" TEXT NOT NULL,
     "session_id" TEXT NOT NULL,
@@ -46,7 +41,6 @@ CREATE TABLE "auth"."refresh_tokens" (
     CONSTRAINT "refresh_tokens_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
 CREATE TABLE "auth"."email_verification_tokens" (
     "id" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
@@ -58,7 +52,6 @@ CREATE TABLE "auth"."email_verification_tokens" (
     CONSTRAINT "email_verification_tokens_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
 CREATE TABLE "auth"."password_reset_tokens" (
     "id" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
@@ -70,50 +63,34 @@ CREATE TABLE "auth"."password_reset_tokens" (
     CONSTRAINT "password_reset_tokens_pkey" PRIMARY KEY ("id")
 );
 
--- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "auth"."users"("email");
 
--- CreateIndex
 CREATE INDEX "sessions_user_id_idx" ON "auth"."sessions"("user_id");
 
--- CreateIndex
 CREATE INDEX "sessions_expires_at_idx" ON "auth"."sessions"("expires_at");
 
--- CreateIndex
 CREATE UNIQUE INDEX "refresh_tokens_token_hash_key" ON "auth"."refresh_tokens"("token_hash");
 
--- CreateIndex
 CREATE INDEX "refresh_tokens_session_id_idx" ON "auth"."refresh_tokens"("session_id");
 
--- CreateIndex
 CREATE INDEX "refresh_tokens_expires_at_idx" ON "auth"."refresh_tokens"("expires_at");
 
--- CreateIndex
 CREATE UNIQUE INDEX "email_verification_tokens_token_hash_key" ON "auth"."email_verification_tokens"("token_hash");
 
--- CreateIndex
 CREATE INDEX "email_verification_tokens_user_id_idx" ON "auth"."email_verification_tokens"("user_id");
 
--- CreateIndex
 CREATE INDEX "email_verification_tokens_expires_at_idx" ON "auth"."email_verification_tokens"("expires_at");
 
--- CreateIndex
 CREATE UNIQUE INDEX "password_reset_tokens_token_hash_key" ON "auth"."password_reset_tokens"("token_hash");
 
--- CreateIndex
 CREATE INDEX "password_reset_tokens_user_id_idx" ON "auth"."password_reset_tokens"("user_id");
 
--- CreateIndex
 CREATE INDEX "password_reset_tokens_expires_at_idx" ON "auth"."password_reset_tokens"("expires_at");
 
--- AddForeignKey
 ALTER TABLE "auth"."sessions" ADD CONSTRAINT "sessions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "auth"."refresh_tokens" ADD CONSTRAINT "refresh_tokens_session_id_fkey" FOREIGN KEY ("session_id") REFERENCES "auth"."sessions"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "auth"."email_verification_tokens" ADD CONSTRAINT "email_verification_tokens_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "auth"."password_reset_tokens" ADD CONSTRAINT "password_reset_tokens_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE ON UPDATE CASCADE;

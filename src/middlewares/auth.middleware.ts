@@ -4,7 +4,6 @@ import { ForbiddenError, UnauthorizedError } from '../utils/errors/appError.js'
 
 /**
  * Express middleware to authenticate requests via Bearer access token.
- * Extracts token from Authorization header, verifies it, and attaches `req.user`.
  */
 export const authenticate: RequestHandler = async (req, _res, next) => {
     try {
@@ -33,7 +32,6 @@ export const authenticate: RequestHandler = async (req, _res, next) => {
 
 /**
  * Express middleware to ensure the authenticated user has a verified email address.
- * Use on sensitive routes that require verified identity.
  */
 export const requireVerifiedEmail: RequestHandler = (req, _res, next) => {
     if (!req.user) {
@@ -53,7 +51,6 @@ export const requireVerifiedEmail: RequestHandler = (req, _res, next) => {
 
 /**
  * Express middleware to enforce role-based access control.
- * Ensures the authenticated user has one of the allowed roles.
  */
 export function authorize(...allowedRoles: UserRole[]): RequestHandler {
     return (req, _res, next) => {

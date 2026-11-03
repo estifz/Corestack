@@ -6,6 +6,7 @@ import { runPrompts } from './prompts.js'
 import { scaffoldProject } from './scaffold.js'
 import type { CliFlags, ProjectConfig } from './types.js'
 import { commitInitialFiles, initGit } from './utils/git.js'
+import { printBanner } from './utils/banner.js'
 import {
     formatProject,
     installDependencies,
@@ -32,6 +33,8 @@ const program = new Command()
             flags?: CliFlags & { skipInstall?: boolean },
         ) => {
             try {
+                printBanner()
+
                 let config: ProjectConfig
 
                 const hasExplicitFlags = process.argv
@@ -54,31 +57,6 @@ const program = new Command()
                 } else {
                     config = await runPrompts(targetDir)
                 }
-
-                // Summary of captured config
-                console.log('\n' + pc.bold(pc.green('Selected Configuration:')))
-                console.log(
-                    `  ${pc.cyan('Project Name:')}     ${config.projectName}`,
-                )
-                console.log(
-                    `  ${pc.cyan('Target Path:')}      ${config.projectPath}`,
-                )
-                console.log(
-                    `  ${pc.cyan('Database:')}         ${config.databaseProvider}`,
-                )
-                console.log(
-                    `  ${pc.cyan('Auth & RBAC:')}      ${config.includeAuth ? pc.green('Yes') : pc.red('No')}`,
-                )
-                console.log(
-                    `  ${pc.cyan('Documentation:')}    ${config.includeDocs ? pc.green('Yes') : pc.red('No')}`,
-                )
-                console.log(
-                    `  ${pc.cyan('Docker Setup:')}     ${config.includeDocker ? pc.green('Yes') : pc.red('No')}`,
-                )
-                console.log(
-                    `  ${pc.cyan('Package Manager:')}  ${config.packageManager}`,
-                )
-                console.log('')
 
                 const s = spinner()
 

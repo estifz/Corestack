@@ -1,4 +1,4 @@
-import { cancel, confirm, intro, isCancel, select, text } from '@clack/prompts'
+import { cancel, confirm, isCancel, select, text } from '@clack/prompts'
 import path from 'node:path'
 import pc from 'picocolors'
 import type { DatabaseProvider, ProjectConfig, SetupMode } from './types.js'
@@ -7,8 +7,6 @@ import { detectPackageManager } from './utils/pm.js'
 export async function runPrompts(
     initialTargetDir?: string,
 ): Promise<ProjectConfig> {
-    intro(pc.bgCyan(pc.black(' CoreStack CLI Scaffolder ')))
-
     // 1. Target directory
     let targetDir = initialTargetDir
 
@@ -75,12 +73,10 @@ export async function runPrompts(
                 {
                     value: 'postgres',
                     label: 'PostgreSQL (Prisma)',
-                    hint: 'battle-tested relational persistence with Prisma 7',
                 },
                 {
                     value: 'mongodb',
                     label: 'MongoDB (Mongoose)',
-                    hint: 'flexible document persistence with Mongoose models',
                 },
             ],
             initialValue: 'postgres',

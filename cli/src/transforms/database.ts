@@ -193,4 +193,47 @@ export const userController = new UserController(service)
             fs.writeFileSync(userIndex, code, 'utf-8')
         }
     }
+
+    // 5. Update database readiness check and target user ID in docs/requests.http
+    const requestsHttpFile = path.join(root, 'docs', 'requests.http')
+    if (fs.existsSync(requestsHttpFile) && !isPostgres) {
+        let content = fs.readFileSync(requestsHttpFile, 'utf-8')
+        content = content
+            .replace('PostgreSQL Readiness Check', 'MongoDB Readiness Check')
+            .replace(
+                '@targetUserId = your_user_uuid_here',
+                '@targetUserId = your_user_id_here',
+            )
+        fs.writeFileSync(requestsHttpFile, content, 'utf-8')
+    }
+
+    // 6. Tailor OpenAPI documentation for MongoDB
+    const openapiFile = path.join(root, 'src', 'docs', 'openapi.ts')
+    if (fs.existsSync(openapiFile) && !isPostgres) {
+        let content = fs.readFileSync(openapiFile, 'utf-8')
+        content = content
+            .replace(
+                'PostgreSQL database readiness check',
+                'MongoDB database readiness check',
+            )
+            .replace(
+                'Executes a lightweight query against PostgreSQL to ensure the persistence layer is healthy.',
+                'Performs a ping command against MongoDB to ensure the persistence layer is healthy.',
+            )
+            .replace(
+                'PostgreSQL is connected and ready',
+                'MongoDB is connected and ready',
+            )
+            .replace('PostgreSQL is unavailable', 'MongoDB is unavailable')
+            .replace(
+                "description: 'Target user UUID'",
+                "description: 'Target user ObjectId'",
+            )
+            .replaceAll("format: 'uuid'", () => "pattern: '^[0-9a-fA-F]{24}$'")
+            .replaceAll(
+                "example: 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d'",
+                "example: '507f1f77bcf86cd799439011'",
+            )
+        fs.writeFileSync(openapiFile, content, 'utf-8')
+    }
 }
