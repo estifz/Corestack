@@ -97,6 +97,22 @@ describe('HTTP API', () => {
         expect(response.body.code).toBe('VALIDATION_ERROR')
     })
 
+    it('validates resend verification payload before reaching persistence', async () => {
+        const response = await request(app)
+            .post('/api/v1/auth/resend-verification')
+            .send({ email: 'bad-email' })
+        expect(response.status).toBe(400)
+        expect(response.body.code).toBe('VALIDATION_ERROR')
+    })
+
+    it('validates forgot password payload before reaching persistence', async () => {
+        const response = await request(app)
+            .post('/api/v1/auth/forgot-password')
+            .send({ email: 'bad-email' })
+        expect(response.status).toBe(400)
+        expect(response.body.code).toBe('VALIDATION_ERROR')
+    })
+
     it('returns a structured JSON error when route is not found', async () => {
         const response = await request(app).get('/api/v1/unknown-endpoint')
         expect(response.status).toBe(404)

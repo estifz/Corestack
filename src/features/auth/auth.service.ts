@@ -69,7 +69,14 @@ export class AuthService {
             email.trim().toLowerCase(),
         )
         if (!user || user.emailVerifiedAt) return
-        await this.issueEmailVerification(user.id, user.email)
+        try {
+            await this.issueEmailVerification(user.id, user.email)
+        } catch (error) {
+            logger.error(
+                { err: error, userId: user.id, email: user.email },
+                'Failed to send verification email during resend',
+            )
+        }
     }
 
     private async issueEmailVerification(userId: string, email: string) {
@@ -108,7 +115,14 @@ export class AuthService {
             createdAt,
         })
 
-        await sendPasswordResetEmail(user.email, token)
+        try {
+            await sendPasswordResetEmail(user.email, token)
+        } catch (error) {
+            logger.error(
+                { err: error, userId: user.id, email: user.email },
+                'Failed to send password reset email',
+            )
+        }
     }
 
     async resetPassword(token: string, newPassword: string): Promise<void> {

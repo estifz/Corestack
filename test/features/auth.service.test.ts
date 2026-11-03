@@ -122,7 +122,10 @@ describe('AuthService', () => {
         loggerSpy.mockRestore()
     })
 
-    it('propagates email failure when resending verification email', async () => {
+    it('handles email failure gracefully without leaking account status when resending verification', async () => {
+        const loggerSpy = vi
+            .spyOn(logger, 'error')
+            .mockImplementation(() => logger)
         sendVerificationEmail.mockRejectedValueOnce(
             new Error('Resend service unavailable'),
         )
@@ -136,7 +139,17 @@ describe('AuthService', () => {
 
         await expect(
             service.resendVerificationEmail('person@example.com'),
-        ).rejects.toThrow('Resend service unavailable')
+        ).resolves.toBeUndefined()
+
+        expect(loggerSpy).toHaveBeenCalledWith(
+            expect.objectContaining({
+                err: expect.any(Error),
+                userId: 'user-1',
+                email: 'person@example.com',
+            }),
+            'Failed to send verification email during resend',
+        )
+        loggerSpy.mockRestore()
     })
 
     it('rejects registration when the email already exists', async () => {

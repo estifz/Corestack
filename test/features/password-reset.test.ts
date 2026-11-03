@@ -3,6 +3,7 @@ import { AuthService } from '../../src/features/auth/auth.service.js'
 import type { AuthRepository } from '../../src/features/auth/auth.repository.js'
 import { BadRequestError } from '../../src/utils/errors/appError.js'
 import * as authEmail from '../../src/features/auth/auth.email.js'
+import { logger } from '../../src/core/logger/logger.js'
 
 describe('Password Reset', () => {
     let mockRepo: Partial<AuthRepository>
@@ -61,6 +62,42 @@ describe('Password Reset', () => {
                 'user@example.com',
                 expect.any(String),
             )
+        })
+
+        it('handles email failure gracefully without leaking account status', async () => {
+            const loggerSpy = vi
+                .spyOn(logger, 'error')
+                .mockImplementation(() => logger)
+            const sendEmailSpy = vi
+                .spyOn(authEmail, 'sendPasswordResetEmail')
+                .mockRejectedValueOnce(new Error('Resend API down'))
+
+            vi.mocked(mockRepo.findUserByEmail!).mockResolvedValue({
+                id: 'user-123',
+                email: 'user@example.com',
+                passwordHash: 'hashed-pwd',
+                role: 'USER',
+                isActive: true,
+                isEmailVerified: false,
+                emailVerifiedAt: null,
+            })
+
+            const service = new AuthService(mockRepo as AuthRepository)
+            await expect(
+                service.forgotPassword('user@example.com'),
+            ).resolves.toBeUndefined()
+
+            expect(mockRepo.createPasswordResetToken).toHaveBeenCalled()
+            expect(sendEmailSpy).toHaveBeenCalled()
+            expect(loggerSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    err: expect.any(Error),
+                    userId: 'user-123',
+                    email: 'user@example.com',
+                }),
+                'Failed to send password reset email',
+            )
+            loggerSpy.mockRestore()
         })
     })
 
