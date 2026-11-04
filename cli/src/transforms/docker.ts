@@ -55,9 +55,9 @@ services:
             dockerfile: Dockerfile
         restart: unless-stopped
         ports:
-            - '\${PORT}:3000'
+            - '\${PORT:-3000}:3000'
         environment:
-            PORT: \${PORT}
+            PORT: 3000
             NODE_ENV: \${NODE_ENV}
             LOG_LEVEL: \${LOG_LEVEL}
             API_BASE_URL: \${API_BASE_URL}
@@ -128,9 +128,9 @@ services:
             dockerfile: Dockerfile
         restart: unless-stopped
         ports:
-            - '\${PORT}:3000'
+            - '\${PORT:-3000}:3000'
         environment:
-            PORT: \${PORT}
+            PORT: 3000
             NODE_ENV: \${NODE_ENV}
             LOG_LEVEL: \${LOG_LEVEL}
             API_BASE_URL: \${API_BASE_URL}
