@@ -1,7 +1,15 @@
 {
     "name": "Corestack",
     "version": "1.0.0",
-    "description": "",
+    "description": "Production-grade Node.js backend starter kit with Express 5, TypeScript, Auth, and modular databases",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/estifz/Corestack.git"
+    },
+    "bugs": {
+        "url": "https://github.com/estifz/Corestack/issues"
+    },
+    "homepage": "https://github.com/estifz/Corestack#readme",
     "main": "server.js",
     "scripts": {
         "cli:dev": "tsx cli/src/index.ts",
@@ -25,9 +33,20 @@
         "docker:up": "docker compose up -d",
         "docker:down": "docker compose down"
     },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
+    "keywords": [
+        "corestack",
+        "backend",
+        "nodejs",
+        "typescript",
+        "starter-kit",
+        "express",
+        "prisma",
+        "postgresql",
+        "mongodb",
+        "authentication"
+    ],
+    "author": "Estifanos <kingestiff@gmail.com>",
+    "license": "MIT",
     "devEngines": {
         "packageManager": {
             "name": "pnpm",

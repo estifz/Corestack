@@ -1,7 +1,7 @@
 {
     "name": "create-corestack",
     "version": "1.0.0",
-    "description": "Scaffolding CLI for CoreStack production backends",
+    "description": "Scaffold reusable Node.js backends with configurable databases, authentication, and more.",
     "type": "module",
     "bin": {
         "create-corestack": "./dist/index.js"
@@ -11,6 +11,23 @@
         "dist",
         "template"
     ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/estifz/Corestack.git",
+        "directory": "cli"
+    },
+    "bugs": {
+        "url": "https://github.com/estifz/Corestack/issues"
+    },
+    "homepage": "https://github.com/estifz/Corestack#readme",
+    "author": "Estifanos <kingestiff@gmail.com>",
+    "license": "MIT",
+    "engines": {
+        "node": ">=20.0.0"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
     "scripts": {
         "dev": "tsx src/index.ts",
         "bundle:template": "tsx scripts/bundle-template.ts",
@@ -19,15 +36,20 @@
     },
     "keywords": [
         "corestack",
-        "cli",
-        "scaffold",
-        "express",
+        "backend",
+        "nodejs",
         "typescript",
+        "cli",
+        "scaffolding",
+        "project-generator",
+        "starter-kit",
+        "backend-template",
+        "express",
         "prisma",
-        "mongodb"
+        "postgresql",
+        "mongodb",
+        "authentication"
     ],
-    "author": "",
-    "license": "ISC",
     "dependencies": {
         "@clack/prompts": "^0.11.0",
         "commander": "^14.0.3",
