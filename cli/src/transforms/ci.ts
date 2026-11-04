@@ -23,7 +23,7 @@ export function transformCi(config: ProjectConfig): void {
     // 2. Setup runtime & package manager
     if (pm === 'pnpm') {
         steps.push(
-            `            - name: Setup pnpm\n              uses: pnpm/action-setup@v4\n              with:\n                  version: 10`,
+            `            - name: Setup pnpm\n              uses: pnpm/action-setup@v4\n              with:\n                  version: 11`,
         )
         steps.push(
             `            - name: Setup Node.js\n              uses: actions/setup-node@v4\n              with:\n                  node-version: 24\n                  cache: 'pnpm'`,
