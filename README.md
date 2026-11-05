@@ -12,6 +12,10 @@ CoreStack is a modular backend foundation and CLI scaffolder for building scalab
 > **Build the foundation once. Reuse it across projects.**  
 > CoreStack is not designed to eliminate engineering decisions - it is designed to eliminate **repetitive engineering work**.
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/estifz/Corestack/main/assets/demo.gif" alt="CoreStack Scaffolding Demo" width="720">
+</p>
+
 ---
 
 ## 🚀 Quick Scaffolding

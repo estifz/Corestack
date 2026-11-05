@@ -8,6 +8,10 @@
 
 CoreStack is a CLI generator for modern TypeScript backends. Effortlessly generate clean REST APIs with your choice of database - PostgreSQL or MongoDB, complete with enterprise-grade JWT authentication, interactive Scalar API documentation, and Docker Compose out of the box.
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/estifz/Corestack/main/assets/demo.gif" alt="CoreStack Scaffolding Demo" width="720">
+</p>
+
 ---
 
 ## 🚀 Quick Start
