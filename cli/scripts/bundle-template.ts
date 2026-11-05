@@ -7,6 +7,7 @@ const __dirname = path.dirname(__filename)
 
 const ROOT_DIR = path.resolve(__dirname, '../../')
 const TEMPLATE_DIR = path.resolve(__dirname, '../template')
+const CLI_PKG_PATH = path.resolve(__dirname, '../package.json')
 
 // Exact root files and directories to copy into the template bundle
 const INCLUDED_ENTRIES = [
@@ -73,7 +74,10 @@ function copyRecursive(src: string, dest: string): void {
 }
 
 export function bundleTemplate(): void {
-    console.log('[bundle-template] Packaging v0.5.0 into cli/template/...')
+    const pkg = JSON.parse(fs.readFileSync(CLI_PKG_PATH, 'utf-8'))
+    console.log(
+        `[bundle-template] Packaging v${pkg.version} into cli/template/...`,
+    )
 
     if (fs.existsSync(TEMPLATE_DIR)) {
         fs.rmSync(TEMPLATE_DIR, { recursive: true, force: true })
