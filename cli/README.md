@@ -1,6 +1,6 @@
-# create-corestack
+# create-corestack-app
 
-[![npm version](https://img.shields.io/npm/v/create-corestack.svg)](https://www.npmjs.com/package/create-corestack)
+[![npm version](https://img.shields.io/npm/v/create-corestack-app.svg)](https://www.npmjs.com/package/create-corestack-app)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Node Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](https://nodejs.org)
 
@@ -16,16 +16,16 @@ Run any of the following commands in your terminal to start the interactive scaf
 
 ```bash
 # Using pnpm
-pnpm create corestack my-app
+pnpm create corestack-app my-app
 
 # Using npm
-npm create corestack@latest my-app
+npm create corestack-app@latest my-app
 
 # Using Bun
-bun create corestack my-app
+bun create corestack-app my-app
 
 # Using Yarn
-yarn create corestack my-app
+yarn create corestack-app my-app
 ```
 
 > **Note**: You can omit `my-app` to be prompted for a project name interactively.
@@ -45,7 +45,7 @@ yarn create corestack my-app
 
 ## CLI Options & Flags
 
-When running `create-corestack`, you can configure your project interactively or pass flags to automate the setup:
+When running `create-corestack-app`, you can configure your project interactively or pass flags to automate the setup:
 
 | Flag                  | Description                                                     | Default           |
 | :-------------------- | :-------------------------------------------------------------- | :---------------- |
@@ -61,16 +61,16 @@ When running `create-corestack`, you can configure your project interactively or
 
 ```bash
 # Recommended full-stack preset
-pnpm create corestack my-api --recommended
+pnpm create corestack-app my-api --recommended
 
 # MongoDB backend
-pnpm create corestack analytics-service -d mongodb
+pnpm create corestack-app analytics-service -d mongodb
 
 # Minimal public API without authentication or Docker
-npm create corestack@latest public-api -- --no-auth --no-docker
+npm create corestack-app@latest public-api -- --no-auth --no-docker
 
 # Fast scaffolding without installing packages (great for CI or inspection)
-bun create corestack test-app --skip-install
+bun create corestack-app test-app --skip-install
 ```
 
 ---

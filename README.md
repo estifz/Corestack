@@ -1,6 +1,6 @@
 # CoreStack
 
-[![npm version](https://img.shields.io/npm/v/create-corestack.svg)](https://www.npmjs.com/package/create-corestack)
+[![npm version](https://img.shields.io/npm/v/create-corestack-app.svg)](https://www.npmjs.com/package/create-corestack-app)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Node Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](https://nodejs.org)
 [![Tests](https://github.com/estifz/Corestack/actions/workflows/test.yml/badge.svg)](https://github.com/estifz/Corestack/actions)
@@ -20,23 +20,25 @@ The fastest way to bootstrap a new CoreStack project is via our official CLI:
 
 ```bash
 # Using pnpm
-pnpm create corestack my-app
+pnpm create corestack-app my-app
 
 # Using npm
-npm create corestack@latest my-app
+npm create corestack-app@latest my-app
 
 # Using Bun
-bun create corestack my-app
+bun create corestack-app my-app
 
 # Using Yarn
-yarn create corestack my-app
+yarn create corestack-app my-app
 ```
+
+> **Note**: You can omit `my-app` to be prompted for a project name interactively.
 
 The interactive CLI will prompt you to choose your database, toggle authentication, API docs, and Docker setup, or you can use flags for instant generation:
 
 ```bash
 # Recommended full-stack preset (PostgreSQL + Auth + Docs + Docker)
-pnpm create corestack my-app --recommended
+pnpm create corestack-app my-app --recommended
 ```
 
 ---
@@ -80,7 +82,7 @@ Client  ──►  Route  ──►  Controller  ──►  Service  ──►  
 
 ```text
 .
-├── cli/                  # create-corestack CLI generator package
+├── cli/                  # create-corestack-app CLI generator package
 ├── docs/                 # In-editor HTTP request collections
 ├── prisma/               # Prisma 7 schema and standard SQL migrations
 ├── src/
@@ -202,4 +204,4 @@ Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
 
 - **GitHub Repository**: [https://github.com/estifz/Corestack](https://github.com/estifz/Corestack)
 - **Issue Tracker**: [https://github.com/estifz/Corestack/issues](https://github.com/estifz/Corestack/issues)
-- **CLI Package**: [https://www.npmjs.com/package/create-corestack](https://www.npmjs.com/package/create-corestack)
+- **CLI Package**: [https://www.npmjs.com/package/create-corestack-app](https://www.npmjs.com/package/create-corestack-app)
