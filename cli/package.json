@@ -1,10 +1,11 @@
 {
-    "name": "create-corestack",
+    "name": "create-corestack-app",
     "version": "1.0.0",
     "description": "Scaffold reusable Node.js backends with configurable databases, authentication, and more.",
     "type": "module",
     "bin": {
-        "create-corestack": "./dist/index.js"
+        "create-corestack-app": "./dist/index.js",
+        "corestack-app": "./dist/index.js"
     },
     "main": "./dist/index.js",
     "files": [

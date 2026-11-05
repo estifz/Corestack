@@ -15,7 +15,7 @@ import {
 import { detectPackageManager, getRunCommand } from './utils/pm.js'
 
 const program = new Command()
-    .name('create-corestack')
+    .name('create-corestack-app')
     .description('Scaffold a modern, production-grade CoreStack backend')
     .argument('[target-dir]', 'Directory where the project will be created')
     .option('-r, --recommended', 'Use recommended preset defaults')
